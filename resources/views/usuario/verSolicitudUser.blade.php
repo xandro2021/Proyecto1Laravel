@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+
+    <title>OfficeLend – Detalles de Solicitud de Préstamo</title>
+    <script type="text/javascript" src="/js/usuario/userGuard.js"></script>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+
+    <link rel="stylesheet" href="{{ asset('css/admin/verSolicitudAdmin.css') }}" type="text/css" media="screen" >
+</head>
+
+<body>
+    <!-- verSolicitudUser.html -->
+    <header class="sticky-top bg-white shadow-sm" style="backdrop-filter: blur(8px);">
+        <div class="container py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <!-- Logo -->
+                <div class="d-flex align-items-center gap-2">
+                    <img alt="Logo OfficeLend" class="h-10 w-10 rounded-3" src="/img/logo.png">
+                    <span class="fs-3 fw-bold text-custom-primary font-headline tracking-tight">OfficeLend</span>
+                </div>
+
+                <!-- Navegación desktop -->
+                <nav class="d-none d-md-flex gap-4">
+                    <a class="nav-link active text-custom-primary" href="/user/catalogo">Equipos</a>
+                    <a class="nav-link text-custom-primary" href="/user/prestamos">Préstamos</a>
+                    <!-- salir ir a login -->
+                    <a class="nav-link text-custom-primary" href="#" onclick="logout()">Salir</a>
+                </nav>
+
+                <!-- Acciones usuario -->
+                <div class="d-flex align-items-center gap-3">
+
+                    <span id="viewModeLabel" class="small fw-semibold text-custom-primary">Usuario</span>
+
+                    <a href="/user/catalogo" class="btn btn-link p-0 text-custom-primary">
+                        <span id="viewModeIcon" class="material-symbols-outlined" style="font-size: 32px;">Usuario</span>
+                    </a>
+
+                    <button class="btn btn-link text-custom-primary p-2">
+                        <span class="material-symbols-outlined">notifications</span>
+                    </button>
+                    <button class="btn btn-link text-custom-primary p-2">
+                        <span class="material-symbols-outlined">settings</span>
+                    </button>
+                    <div class="rounded-circle overflow-hidden border border-light shadow-sm"
+                        style="width: 40px; height: 40px;">
+                        <img alt="Foto de perfil del usuario" class="w-100 h-100 object-fit-cover"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDw7nxzJSdrR71CDJcr7kC74LjSK0FQ4lqpD3NebHzuBF2OKLcobdpMmXLTfXGjKhnwCsGDV2mN9HPKDx-tqzf23jNvhXxFM75S6XKC3LG98PiUY7HxPnK2lIS1M_4GLStSAhndvd9Qn50PRYC5jcBbYgw4BSiKmrhfaCEilKQgy1fH7KuLwKDGqS4BSOc6v4w6xKL722wJvMxtVxo4_cE_vR5qmR6qfuI_PH9r7xPCSIJzDIrCuivh_EQ1OP5_X1nTqItkinNBbVc">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ── Principal ────────────────────────────────────────────────────────── -->
+    <main class="container py-5">
+
+        <!-- Acciones del encabezado -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-5">
+            <div class="d-flex align-items-center gap-3">
+                <a href="/user/prestamos" class="back-btn">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    <span>Volver a la Lista</span>
+                </a>
+                <div class="divider-v"></div>
+                <h1 class="mb-0 fs-3 fw-800 text-nowrap"
+                    style="color:var(--color-primary); font-family:'Manrope',sans-serif; font-weight:800; letter-spacing:-.5px;">
+                    Detalles de Solicitud de Préstamo
+                </h1>
+            </div>
+            <div>
+                <span class="status-badge">
+                    <span class="material-symbols-outlined"
+                        style="font-size:.85rem; font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20;">pending</span>
+                    Pendiente de Revisión
+                </span>
+            </div>
+        </div>
+
+        <!-- Cuadrícula Bento -->
+        <div class="row g-4">
+
+            <!-- ── Columna Izquierda ─────────────────────────────────────────── -->
+            <div class="col-12 col-lg-8 d-flex flex-column gap-4">
+
+                <!-- Tarjeta de Información del Solicitante -->
+                <section class="card-base">
+                    <div class="d-flex align-items-start justify-content-between mb-4">
+                        <div>
+                            <h2 class="fs-5 fw-bold mb-1" style="color:var(--color-primary);">Información del
+                                Solicitante</h2>
+                            <p class="mb-0 small" style="color:var(--color-on-surface-variant);">
+                                Revise las credenciales del prestatario y su afiliación institucional.
+                            </p>
+                        </div>
+                        <span class="material-symbols-outlined" style="color:var(--color-outline);">person</span>
+                    </div>
+
+                    <div class="d-flex flex-column flex-md-row align-items-center gap-4">
+                        <img class="applicant-photo"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOr2jXGiCv99-0tK9-QyP7ydPd97cIARa3snxSdw76TDLmbcm_K9zoYujQPGzGU0WHglrB4J676N85KFokA4hKYnI4v_W2x3Upf3JcQXmfXQaer_h_DlwiXE51pp8KZgkzzeOhx_ScbqCs7LvENnvNpJuzsDzXSTxhX8I83vqq0UbKaHieaY5PNJfAxU_RyNQnjsy72jJIgPnT2ZldjM4FrJOJ-M89OSTArl18XY-D30sYphBc9npf47R-Ibbaef69ArGXnig_fFg"
+                            alt="Foto del usuario" />
+
+                        <div class="row g-4 flex-grow-1 w-100">
+                            <div class="col-12 col-sm-6">
+                                <span class="field-label">Nombre Completo</span>
+                                <p id="nombreUsuario" class="field-value mb-0"></p>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <span class="field-label">Id Usuario</span>
+                                <p id="idUsuario" class="field-value mb-0"></p>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <span class="field-label">Role</span>
+                                <p id="roleUsuario" class="field-value mb-0"></p>
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <span class="field-label">Correo de Contacto</span>
+                                <p id="correoUsuario" class="mb-0"></p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Tarjeta de Información del Activo -->
+                <section class="card-base overflow-hidden position-relative">
+                    <div class="d-flex align-items-start justify-content-between mb-4">
+                        <div>
+                            <h2 class="fs-5 fw-bold mb-1" style="color:var(--color-primary);">Información del Equipo
+                            </h2>
+                            <p class="mb-0 small" style="color:var(--color-on-surface-variant);">
+                                Especificaciones técnicas del hardware solicitado.
+                            </p>
+                        </div>
+                        <span class="material-symbols-outlined" style="color:var(--color-outline);">devices</span>
+                    </div>
+
+                    <div class="row g-4 align-items-center">
+                        <div class="col-12 col-md-4">
+                            <img class="equipment-img"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcgrL7Gg88QFdZ6QafPFghzQfC30XMQnQTP-G_gzQHpQQC0VqDlyda2jhf0b-SRips379uAzFqWlw-NhY9gxindegA1CR6elS1yi4s8vy6IVdHflLVbYI-gRuWrffaka6kekrSwI-0qJPlilFXxoSAfWjFEtu_IWiAkdf_iXPxkQLaTJzruvMR8Z9sGItRZiJYWZmoHoQuDN2jHxJ149RxTdh96s-zDdVLQ5nnaKNJq34thBV4OXWvj_b9alWq0mScRvGWIBPJVJs"
+                                alt="Equipo" />
+                        </div>
+                        <div class="col-12 col-md-8">
+                            <div class="row g-4">
+                                <div class="col-12">
+                                    <span class="field-label">Nombre del Equipo</span>
+                                    <p id="nombreEquipo" class="mb-0 fs-5 fw-bold"
+                                        style="color:var(--color-on-surface);">
+
+                                    </p>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                    <span class="field-label">Id Equipo</span>
+                                    <span id="idEquipo" class="mono-chip"></span>
+                                </div>
+                                <div class="col-12 col-sm-6">
+                                    <span class="field-label">Categoría</span>
+                                    <p id="typeEquipo" class="mb-0 fw-semibold small d-flex align-items-center gap-1"
+                                        style="color:var(--color-on-surface);">
+                                        <span class="material-symbols-outlined"
+                                            style="font-size:1rem;">laptop_mac</span>
+                                        Categoria...
+                                    </p>
+                                </div>
+                                <div class="col-12">
+                                    <span class="field-label">Estado al Momento de la Entrega</span>
+                                    <div class="d-flex gap-2 mt-1">
+                                        <span class="badge-excellent">EXCELENTE</span>
+                                        <span class="badge-neutral">ASEGURADO</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div><!-- /columna izquierda -->
+
+            <!-- ── Columna Derecha ────────────────────────────────────────── -->
+            <div class="col-12 col-lg-4 d-flex flex-column gap-4">
+
+                <!-- Línea de Tiempo de la Solicitud -->
+                <section class="card-tinted">
+                    <h2 class="fs-5 fw-bold mb-4" style="color:var(--color-primary);">Cronograma de la Solicitud</h2>
+
+                    <div class="timeline-wrapper">
+                        <div class="timeline-line">
+                            <div class="timeline-line-fill"></div>
+                        </div>
+
+                        <div class="d-flex flex-column gap-4">
+                            <!-- Ítem 1 -->
+                            <div class="timeline-item">
+                                <div class="timeline-dot timeline-dot-primary">
+                                    <span class="material-symbols-outlined">calendar_today</span>
+                                </div>
+                                <span class="field-label">Fecha de Solicitud</span>
+                                <p id="fechaSolicitud" class="fw-bold mb-0" style="color:var(--color-on-surface);">24
+                                    oct. 2023</p>
+                            </div>
+
+                            <!-- Ítem 2 -->
+                            <div class="timeline-item">
+                                <div class="timeline-dot timeline-dot-secondary">
+                                    <span class="material-symbols-outlined"
+                                        style="color:var(--color-on-secondary-container);">event_repeat</span>
+                                </div>
+                                <span class="field-label">Devolución Estimada</span>
+                                <p id="fechaDevolucionEstimada" class="fw-bold mb-0"
+                                    style="color:var(--color-on-surface);">15 dic. 2023</p>
+                                <span id="duracion"
+                                    style="font-size:.625rem; color:var(--color-secondary); font-weight:600; font-style:italic;">
+                                    (Duración: 52 días)
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Propósito -->
+                    <div class="mt-4 pt-4" style="border-top:1px solid rgba(197,197,211,.35);">
+                        <span class="field-label mb-2 d-block">Motivo de la Solicitud</span>
+                        <p class="purpose-quote mb-0">
+                            "El equipo es necesario para el próximo seminario 'Archivos Digitales del Siglo XX'.
+                            Se utilizará software especializado de renderizado de video que requiere hardware de alto
+                            rendimiento para las presentaciones de los estudiantes."
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Zona de Acción -->
+                <section class="card-action">
+                    <div class="mb-4">
+                        <h2 class="fs-5 fw-bold mb-1">Decisión Requerida</h2>
+                        <p class="mb-0 small" style="color:var(--color-primary-fixed-dim); opacity:.85;">
+                            Esta acción notificará al solicitante de inmediato a través de su correo institucional.
+                        </p>
+                    </div>
+
+                    <div class="d-flex flex-column gap-3 mb-4">
+                        <button id="action-btn" class="btn-approve"></button>
+                        <button id="reject-btn" class="btn-reject" style="display:none;"></button>
+                    </div>
+
+                    <div class="pt-3" style="border-top:1px solid rgba(255,255,255,.12);">
+                        <p class="admin-note mb-0">Se Requiere Verificación del Administrador</p>
+                    </div>
+                </section>
+
+                <!-- Registro del Sistema -->
+                <div class="log-chip">
+                    <div class="log-icon">
+                        <span class="material-symbols-outlined" style="color:var(--color-outline);">history</span>
+                    </div>
+                    <div>
+                        <p class="field-label mb-1">Última Actividad</p>
+                        <p class="mb-0 small" style="color:var(--color-on-surface-variant);">
+                            Solicitud enviada por Elena Rodríguez · hace 2 horas
+                        </p>
+                    </div>
+                </div>
+
+            </div><!-- /columna derecha -->
+
+        </div><!-- /row -->
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="/js/usuario/verSolicitudUser.js"></script>
+</body>
+
+</html>

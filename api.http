@@ -1,0 +1,246 @@
+### ========================================
+### OFFICELEND API - Laravel
+### ========================================
+
+@baseUrl = http://127.0.0.1:8000/api
+@token = 4|5ZyNy6r5N0L4b2jj01le2EpVXVTgmOFMguQjo97mcb492922
+
+
+### ========================================
+### AUTH
+### ========================================
+
+### Login ADMIN
+POST {{baseUrl}}/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "username": "admin",
+    "password": "admin"
+}
+
+###
+
+### Login USER
+POST {{baseUrl}}/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "username": "user",
+    "password": "user"
+}
+
+###
+
+### Register
+POST {{baseUrl}}/register
+Content-Type: application/json
+Accept: application/json
+
+{
+    "username": "jdoe",
+    "email": "jdoe@test.com",
+    "password": "123456",
+    "full_name": "John Doe",
+    "role": "USER"
+}
+
+
+### ========================================
+### EQUIPMENT
+### ========================================
+
+### Obtener todos
+GET {{baseUrl}}/equipment
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Obtener por ID
+GET {{baseUrl}}/equipment/1
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Crear equipo SIN imagen
+POST {{baseUrl}}/equipment
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "name": "Laptop Dell XPS",
+    "type": "Laptop",
+    "description": "Laptop de alto rendimiento",
+    "stock": 5,
+    "status": "DISPONIBLE"
+}
+
+###
+
+### Crear equipo CON imagen
+POST {{baseUrl}}/equipment
+Authorization: Bearer {{token}}
+Accept: application/json
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="name"
+
+Laptop Lenovo
+--boundary
+Content-Disposition: form-data; name="type"
+
+Laptop
+--boundary
+Content-Disposition: form-data; name="description"
+
+Laptop empresarial
+--boundary
+Content-Disposition: form-data; name="stock"
+
+10
+--boundary
+Content-Disposition: form-data; name="status"
+
+DISPONIBLE
+--boundary
+Content-Disposition: form-data; name="image"; filename="test.jpg"
+Content-Type: image/jpeg
+
+< ./test.jpg
+--boundary--
+
+###
+
+### Actualizar equipo
+PUT {{baseUrl}}/equipment/2
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "name": "Thinkpad T14",
+    "type": "Laptop",
+    "description": "Actualizada",
+    "stock": 7,
+    "status": "OCUPADO"
+}
+
+###
+
+### Eliminar equipo
+DELETE {{baseUrl}}/equipment/4
+Authorization: Bearer {{token}}
+Accept: application/json
+
+
+### ========================================
+### LOANS
+### ========================================
+
+### Obtener todos
+GET {{baseUrl}}/loans
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Obtener préstamo
+GET {{baseUrl}}/loans/3
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Crear préstamo
+POST {{baseUrl}}/loans
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "request_date": "2026-05-16",
+    "start_date": "2026-05-17",
+    "estimated_end_date": "2026-05-25",
+    "actual_return_date": null,
+    "justification": "Necesario para trabajo remoto",
+    "status": "PENDIENTE",
+    "equipment_id": 1,
+    "user_id": 1
+}
+
+###
+
+### Actualizar préstamo
+PUT {{baseUrl}}/loans/3
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "status": "APROBADO"
+}
+
+###
+
+### Eliminar préstamo
+DELETE {{baseUrl}}/loans/3
+Authorization: Bearer {{token}}
+Accept: application/json
+
+
+### ========================================
+### USERS
+### ========================================
+
+### Obtener usuarios
+GET {{baseUrl}}/users
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Obtener usuario
+GET {{baseUrl}}/users/3
+Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+
+### Crear usuario
+POST {{baseUrl}}/users
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "username": "nuevo",
+    "email": "nuevo@test.com",
+    "password": "12345678",
+    "role": "USER",
+    "full_name": "Nuevo Usuario"
+}
+
+###
+
+### Actualizar usuario
+PUT {{baseUrl}}/users/3
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "full_name": "Usuario Actualizado"
+}
+
+###
+
+### Eliminar usuario
+DELETE {{baseUrl}}/users/3
+Authorization: Bearer {{token}}
+Accept: application/json
