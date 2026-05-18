@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", loadLoans);
 
 async function loadLoans() {
   try {
-    const token = localStorage.getItem("jwt");
+    const token = localStorage.getItem("token");
 
     const res = await fetch(API_URL, {
       headers: {
@@ -226,7 +226,7 @@ function updateInfo() {
 
 fetch("http://localhost:8080/loans/my", {
   headers: {
-    "Authorization": "Bearer " + localStorage.getItem("jwt")
+    "Authorization": "Bearer " + localStorage.getItem("token")
   }
 })
   .then(res => res.json())

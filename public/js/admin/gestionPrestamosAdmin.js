@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", loadLoans);
 
 async function loadLoans() {
   try {
-    const token = localStorage.getItem("jwt");
+    const token = localStorage.getItem("token");
 
     const res = await fetch(API_URL, {
       headers: {
@@ -179,7 +179,7 @@ function renderAdminActions(loan) {
 
 async function updateStatus(id, status) {
   try {
-    const token = localStorage.getItem("jwt");
+    const token = localStorage.getItem("token");
 
     const loan = loans.find(l => l.id === id);
 
@@ -221,7 +221,7 @@ async function updateStatus(id, status) {
 
 async function markAsReturned(id) {
   try {
-    const token = localStorage.getItem("jwt");
+    const token = localStorage.getItem("token");
 
     const res = await fetch(`/loans/${id}`, {
       method: "PUT",
@@ -251,7 +251,7 @@ function deleteLoan(id) {
     return;
   }
 
-  const token = localStorage.getItem("jwt");
+  const token = localStorage.getItem("token");
 
   fetch("/loans/" + id, {
     method: "DELETE",

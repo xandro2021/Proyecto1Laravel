@@ -123,7 +123,7 @@ function changePage(page) {
 }
 
 async function loadEquipment() {
-  const token = localStorage.getItem('jwt');
+  const token = localStorage.getItem('token');
 
   try {
     const response = await fetch(`${API_BASE}/equipment`, {
@@ -154,7 +154,7 @@ function editEquipment(id) {
 
 async function deleteEquipment(id) {
   if (!confirm('¿Estás seguro de que deseas eliminar este equipo?')) return;
-  const token = localStorage.getItem('jwt');
+  const token = localStorage.getItem('token');
 
   try {
     const response = await fetch(`${API_BASE}/equipment/${id}`, {

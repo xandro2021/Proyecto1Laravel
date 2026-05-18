@@ -35,7 +35,7 @@
                 <!-- Navegación desktop -->
                 <nav class="d-none d-md-flex gap-4">
                     <a class="nav-link text-custom-primary" href="/admin/dashboard">Dashboard</a>
-                    <a class="nav-link active text-custom-primary" href="/admin/catalogo">Equipos</a>
+                    <a class="nav-link text-custom-primary" href="/admin/catalogo">Equipos</a>
                     <a class="nav-link text-custom-primary" href="/admin/prestamos">Préstamos</a>
                     <!-- salir ir a login -->
                     <a class="nav-link text-custom-primary" href="#" onclick="logout()">Salir</a>

@@ -26,7 +26,7 @@ function changePageTitle() {
 
 // ── Cargar datos del equipo ───────────────────────────────
 async function loadEquipment(id) {
-  const token = localStorage.getItem('jwt');
+  const token = localStorage.getItem('token');
 
   try {
     const response = await fetch(`${API_BASE}/equipment/${id}`, {
@@ -206,7 +206,7 @@ async function guardarEquipo() {
 
   alert.classList.add('d-none');
 
-  const token = localStorage.getItem('jwt');
+  const token = localStorage.getItem('token');
 
   // ← FormData para enviar archivo + otros campos
   const formData = new FormData();

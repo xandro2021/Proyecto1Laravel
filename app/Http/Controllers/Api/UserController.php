@@ -9,6 +9,15 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+     public function __construct()
+    {
+        // 🔐 requiere login
+        $this->middleware('auth:sanctum');
+
+        // 🔐 solo ADMIN puede hacer todo esto
+        $this->middleware('role:ADMIN');
+    }
+
     public function index()
     {
         return User::all();
@@ -22,37 +31,82 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'username' => 'required|unique:users',
-            'email' => 'required|email|unique:users',
+            'username' => 'required|string|max:255|unique:users',
+            'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
-            'role' => 'required',
-            'full_name' => 'required'
+            //'role' => 'required',
+            'full_name' => 'required|string|max:255',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
 
-        return User::create($validated);
+        $validated['role'] = 'ROLE_USER';
+
+        $user = User::create($validated);
+
+        return response()->json($user, 201);
     }
 
     public function update(Request $request, string $id)
     {
-        $user = User::findOrFail($id);
-
-        $data = $request->all();
-
-        if (isset($data['password'])) {
-            $data['password'] = Hash::make($data['password']);
+        if (!$user) {
+            return response()->json([
+                'error' => 'User not found'
+            ], 404);
         }
 
-        $user->update($data);
+        $validated = $request->validate([
+            'username' => 'sometimes|string|max:255|unique:users,username,' . $id,
+            'email' => 'sometimes|email|unique:users,email,' . $id,
+            'password' => 'nullable|min:6',
+            'role' => 'sometimes|string',
+            'full_name' => 'sometimes|string|max:255'
+        ]);
+
+        if (isset($validated['username'])) {
+            $user->username = $validated['username'];
+        }
+
+        if (isset($validated['email'])) {
+            $user->email = $validated['email'];
+        }
+
+        if (!empty($validated['password'])) {
+            $user->password = Hash::make($validated['password']);
+        }
+
+        if (isset($validated['role'])) {
+            $user->role = $validated['role'];
+        }
+
+        if (isset($validated['full_name'])) {
+            $user->full_name = $validated['full_name'];
+        }
+
+        $user->save();
 
         return $user;
     }
 
     public function destroy(string $id)
-    {
-        User::destroy($id);
+     {
+        $user = User::findOrFail($id);
+
+        $user->delete();
 
         return response()->noContent();
+    }
+
+    public function me()
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return response()->json([
+                'error' => 'No autenticado'
+            ], 401);
+        }
+
+        return $user;
     }
 }

@@ -1,6 +1,6 @@
 // verSolicitudUser.js
 document.addEventListener("DOMContentLoaded", async () => {
-  const token = localStorage.getItem("jwt");
+  const token = localStorage.getItem("token");
 
   if (!token) {
     window.location.href = "/login";

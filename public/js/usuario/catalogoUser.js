@@ -8,7 +8,7 @@ let currentPage = 1;
 // Obtener datos
 async function loadEquipments() {
     try {
-        const token = localStorage.getItem("jwt");
+        const token = localStorage.getItem("token");
 
         const res = await fetch(API_URL, {
             headers: {

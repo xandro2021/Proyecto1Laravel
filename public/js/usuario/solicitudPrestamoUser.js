@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
 
     try {
-      const token = localStorage.getItem("jwt");
+      const token = localStorage.getItem("token");
 
       // 1. obtener id del equipo desde la URL
       const pathParts = window.location.pathname.split("/");
@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function cargarEquipo() {
   // Inicio de cargar datos del equipo
-  const token = localStorage.getItem("jwt");
+  const token = localStorage.getItem("token");
   const pathParts = window.location.pathname.split("/");
   const equipmentId = parseInt(pathParts[pathParts.length - 1]);
 

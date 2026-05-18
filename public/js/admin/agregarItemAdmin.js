@@ -120,7 +120,7 @@ async function guardarEquipo() {
 
   alert.classList.add('d-none');
 
-  const token = localStorage.getItem('jwt');
+  const token = localStorage.getItem('token');
 
   // ← FormData para enviar archivo + otros campos
   const formData = new FormData();
