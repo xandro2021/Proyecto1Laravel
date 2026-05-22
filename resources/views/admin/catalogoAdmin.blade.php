@@ -43,7 +43,7 @@
                     <span id="viewModeLabel" class="small fw-semibold text-custom-primary"> Admin </span>
 
                     <a href="/user/catalogo" class="btn btn-link p-0 text-custom-primary">
-                        <span id="viewModeIcon" class="material-symbols-outlined" style="font-size: 32px;"></span>
+                        <span id="viewModeIcon" class="material-symbols-outlined" style="font-size: 32px;">swap_horiz</span>
                     </a>
 
                     <button class="btn btn-link text-custom-primary p-2">
@@ -89,7 +89,7 @@
                         con control total de estados y disponibilidad.
                     </p>
                 </div>
-                <a th:href="@{/admin/catalogo/nuevo}"
+                <a href="/admin/catalogo/nuevo"
                     class="btn btn-custom-gradient d-inline-flex align-items-center gap-2 px-4 py-3 rounded-xl shadow-lg">
                     <span class="material-symbols-outlined">add_circle</span>
                     Agregar Nuevo Equipo
@@ -256,9 +256,9 @@
             menu.style.display = 'none';
         });
 
-        fetch("http://localhost:8080/equipment", {
+        fetch("http://localhost:8000/api/equipment", {
             headers: {
-                "Authorization": "Bearer " + localStorage.getItem("jwt")
+                "Authorization": "Bearer " + localStorage.getItem("token")
             }
         })
             .then(res => res.json())

@@ -43,10 +43,10 @@
                 <!-- Acciones usuario -->
                 <div class="d-flex align-items-center gap-3">
 
-                    <span id="viewModeLabel" class="small fw-semibold text-custom-primary">Usuario</span>
+                    <span id="viewModeLabel" class="small fw-semibold text-custom-primary"> Usuario </span>
 
-                    <a href="/user/catalogo" class="btn btn-link p-0 text-custom-primary">
-                        <span id="viewModeIcon" class="material-symbols-outlined" style="font-size: 32px;">Usuario</span>
+                    <a href="/admin/catalogo" class="btn btn-link p-0 text-custom-primary">
+                        <span id="viewModeIcon" class="material-symbols-outlined" style="font-size: 32px;">swap_horiz</span>
                     </a>
 
                     <button class="btn btn-link text-custom-primary p-2">

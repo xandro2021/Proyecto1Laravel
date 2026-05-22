@@ -1,51 +1,51 @@
 // catalogoAdmin.js
-const API_BASE = 'http://localhost:8080';
+const API_BASE = 'http://127.0.0.1:8000/api';
+const PUBLIC_BASE = 'http://127.0.0.1:8000';
 const ITEMS_PER_PAGE = 4;
 
 let allEquipment = [];
 let currentPage = 1;
 
+
+
 function getStatusBadge(status) {
-  const badges = {
-    DISPONIBLE: `
+    const badges = {
+        DISPONIBLE: `
             <div class="d-flex align-items-center gap-2">
                 <span class="status-dot status-dot-green animate-pulse"></span>
                 <span class="small fw-bold text-green-700">Disponible</span>
             </div>`,
-    OCUPADO: `
+        OCUPADO: `
             <div class="d-flex align-items-center gap-2">
                 <span class="status-dot status-dot-secondary"></span>
                 <span class="small fw-bold text-secondary">Ocupado</span>
             </div>`,
-    MANTENIMIENTO: `
+        MANTENIMIENTO: `
             <div class="d-flex align-items-center gap-2">
                 <span class="status-dot status-dot-slate"></span>
                 <span class="small fw-bold text-slate-500">Mantenimiento</span>
             </div>`
-  };
+    };
 
-  return badges[status] ?? badges['DISPONIBLE'];
+    return badges[status] ?? badges['DISPONIBLE'];
 }
 
 function renderTable(equipmentList) {
-  const tbody = document.getElementById('equipment-tbody');
-  tbody.innerHTML = '';
+    const tbody = document.getElementById('equipment-tbody');
+    tbody.innerHTML = '';
 
-  if (equipmentList.length === 0) {
-    tbody.innerHTML = `
+    if (equipmentList.length === 0) {
+        tbody.innerHTML = `
             <tr>
                 <td colspan="5" class="text-center text-slate-400 py-4">No hay equipos registrados.</td>
             </tr>`;
-    return;
-  }
+        return;
+    }
 
-  equipmentList.forEach(eq => {
-    // ← Construir URL de imagen
-    const imageUrl = eq.imageFilename
-      ? `/uploads/equipment/${eq.imageFilename}`
-      : 'https://via.placeholder.com/80?text=Sin+imagen';
+    equipmentList.forEach(eq => {
+        const imageUrl = eq.image_url || '/img/no-image.png';
 
-    tbody.innerHTML += `
+        tbody.innerHTML += `
             <tr>
                 <td class="py-4 px-4">
                     <div class="d-flex align-items-center gap-3">
@@ -76,37 +76,37 @@ function renderTable(equipmentList) {
                     </div>
                 </td>
             </tr>`;
-  });
+    });
 }
 
 // PAGINACION
 function renderPagination(totalItems) {
-  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
-  const container = document.getElementById('pagination-controls');
-  const info = document.getElementById('pagination-info');
+    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+    const container = document.getElementById('pagination-controls');
+    const info = document.getElementById('pagination-info');
 
-  const start = (currentPage - 1) * ITEMS_PER_PAGE + 1;
-  const end = Math.min(currentPage * ITEMS_PER_PAGE, totalItems);
-  info.innerHTML = `Mostrando <strong>${start} - ${end}</strong> de <strong>${totalItems}</strong> equipos`;
+    const start = (currentPage - 1) * ITEMS_PER_PAGE + 1;
+    const end = Math.min(currentPage * ITEMS_PER_PAGE, totalItems);
+    info.innerHTML = `Mostrando <strong>${start} - ${end}</strong> de <strong>${totalItems}</strong> equipos`;
 
-  container.innerHTML = '';
+    container.innerHTML = '';
 
-  // Botón anterior
-  container.innerHTML += `
+    // Botón anterior
+    container.innerHTML += `
         <button class="btn btn-light border rounded ${currentPage === 1 ? 'disabled opacity-50' : ''}"
             onclick="changePage(${currentPage - 1})">
             <span class="material-symbols-outlined">chevron_left</span>
         </button>`;
 
-  // Botones de página
-  for (let i = 1; i <= totalPages; i++) {
-    container.innerHTML += `
+    // Botones de página
+    for (let i = 1; i <= totalPages; i++) {
+        container.innerHTML += `
             <button class="btn ${i === currentPage ? 'btn-custom-primary fw-bold' : 'btn-light border'} rounded px-3 py-1"
                 onclick="changePage(${i})">${i}</button>`;
-  }
+    }
 
-  // Botón siguiente
-  container.innerHTML += `
+    // Botón siguiente
+    container.innerHTML += `
         <button class="btn btn-light border rounded ${currentPage === totalPages ? 'disabled opacity-50' : ''}"
             onclick="changePage(${currentPage + 1})">
             <span class="material-symbols-outlined">chevron_right</span>
@@ -114,64 +114,64 @@ function renderPagination(totalItems) {
 }
 
 function changePage(page) {
-  const totalPages = Math.ceil(allEquipment.length / ITEMS_PER_PAGE);
-  if (page < 1 || page > totalPages) return;
-  currentPage = page;
-  const start = (currentPage - 1) * ITEMS_PER_PAGE;
-  renderTable(allEquipment.slice(start, start + ITEMS_PER_PAGE));
-  renderPagination(allEquipment.length);
+    const totalPages = Math.ceil(allEquipment.length / ITEMS_PER_PAGE);
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    renderTable(allEquipment.slice(start, start + ITEMS_PER_PAGE));
+    renderPagination(allEquipment.length);
 }
 
 async function loadEquipment() {
-  const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token');
 
-  try {
-    const response = await fetch(`${API_BASE}/equipment`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
+    try {
+        const response = await fetch(`${API_BASE}/equipment`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
 
-    if (response.status === 401 || response.status === 403) {
-      window.location.href = '/';
-      return;
-    }
+        if (response.status === 401 || response.status === 403) {
+            window.location.href = '/';
+            return;
+        }
 
-    allEquipment = await response.json();
-    allEquipment.reverse();
-    changePage(1);
+        allEquipment = await response.json();
+        allEquipment.reverse();
+        changePage(1);
 
-  } catch (error) {
-    console.error('Error al cargar equipos:', error);
-    document.getElementById('equipment-tbody').innerHTML = `
+    } catch (error) {
+        console.error('Error al cargar equipos:', error);
+        document.getElementById('equipment-tbody').innerHTML = `
             <tr>
                 <td colspan="5" class="text-center text-danger py-4">Error al conectar con el servidor.</td>
             </tr>`;
-  }
+    }
 }
 
 function editEquipment(id) {
-  window.location.href = `/admin/catalogo/editar/${id}`;
+    window.location.href = `/admin/catalogo/editar/${id}`;
 }
 
 async function deleteEquipment(id) {
-  if (!confirm('¿Estás seguro de que deseas eliminar este equipo?')) return;
-  const token = localStorage.getItem('token');
+    if (!confirm('¿Estás seguro de que deseas eliminar este equipo?')) return;
+    const token = localStorage.getItem('token');
 
-  try {
-    const response = await fetch(`${API_BASE}/equipment/${id}`, {
-      method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
+    try {
+        const response = await fetch(`${API_BASE}/equipment/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
 
-    if (response.ok) {
-      allEquipment = allEquipment.filter(eq => eq.id !== id);
-      changePage(currentPage);
-      window.location.href = "/admin/catalogo";
-    } else {
-      alert('No se pudo eliminar el equipo.');
+        if (response.ok) {
+            allEquipment = allEquipment.filter(eq => eq.id !== id);
+            changePage(currentPage);
+            window.location.href = "/admin/catalogo";
+        } else {
+            alert('No se pudo eliminar el equipo.');
+        }
+    } catch (error) {
+        console.error('Error al eliminar:', error);
     }
-  } catch (error) {
-    console.error('Error al eliminar:', error);
-  }
 }
 
 // inicio

@@ -49,7 +49,7 @@
                     <span id="viewModeLabel" class="small fw-semibold text-custom-primary"> Admin </span>
 
                     <a href="/user/catalogo" class="btn btn-link p-0 text-custom-primary">
-                        <span id="viewModeIcon" class="material-symbols-outlined" style="font-size: 32px;"></span>
+                        <span id="viewModeIcon" class="material-symbols-outlined" style="font-size: 32px;">swap_horiz</span>
                     </a>
 
                     <button type="button" class="btn btn-link text-custom-primary p-2" onclick="showNotifications()"
@@ -498,10 +498,10 @@
 
                 doc.save("prestamos-vencer.pdf");
             }
-            fetch("http://localhost:8080/dashboard/stats", {
+            fetch("http://localhost:8000/api/dashboard/stats", {
                 method: "GET",
                 headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("jwt")
+                    "Authorization": "Bearer " + localStorage.getItem("token")
                 }
             })
                 .then(res => res.json())
@@ -528,9 +528,9 @@
                 })
                 .catch(err => console.log(err));
 
-            fetch("http://localhost:8080/dashboard/top-equipos", {
+            fetch("http://localhost:8000/api/dashboard/top-equipos", {
                 headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("jwt")
+                    "Authorization": "Bearer " + localStorage.getItem("token")
                 }
             })
                 .then(res => res.json())
@@ -550,9 +550,9 @@
                     document.getElementById("topEquipos").innerHTML = html;
                 });
 
-            fetch("http://localhost:8080/auth/me", {
+            fetch("http://localhost:8000/api/auth/me", {
                 headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("jwt")
+                    "Authorization": "Bearer " + localStorage.getItem("token")
                 }
             })
                 .then(res => res.json())

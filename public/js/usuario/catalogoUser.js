@@ -1,5 +1,5 @@
 // catalogoUser.js
-const API_URL = "/equipment";
+const API_URL = "http://127.0.0.1:8000/api/equipment";
 const ITEMS_PER_PAGE = 8;
 
 let equipments = [];
@@ -59,8 +59,8 @@ function createCard(eq) {
     const statusClass = getStatusClass(eq.status);
     const statusText = eq.status;
 
-    const imageUrl = eq.imageFilename
-        ? `/uploads/equipment/${eq.imageFilename}`
+    const imageUrl = eq.image_filename
+        ? `/uploads/equipment/${eq.image_filename}`
         : "https://via.placeholder.com/300x200";
 
     col.innerHTML = `

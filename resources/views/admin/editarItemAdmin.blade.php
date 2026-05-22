@@ -13,7 +13,7 @@
         rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="{{ asset('css/admin/agregarItemAdminAdmin.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin/agregarItemAdmin.css') }}">
 </head>
 
 <body class="bg-surface">
@@ -36,7 +36,7 @@
                     <span id="viewModeLabel" class="small fw-semibold text-custom-primary"> Admin </span>
 
                     <a href="/user/catalogo" class="btn btn-link p-0 text-custom-primary">
-                        <span id="viewModeIcon" class="material-symbols-outlined" style="font-size: 32px;"></span>
+                        <span id="viewModeIcon" class="material-symbols-outlined" style="font-size: 32px;">swap_horiz</span>
                     </a>
 
                     <button class="btn btn-link text-custom-primary p-2">
@@ -69,7 +69,7 @@
                 <p class="page-subtitle">Registra y cataloga nuevos activos institucionales con precisión.</p>
             </div>
             <div class="d-flex gap-3">
-                <a th:href="@{/admin/catalogo}"
+                <a href="/admin/catalogo"
                     class="btn btn-outline-secondary flex-grow-1 py-2 rounded-lg border-outline-variant text-custom-primary fw-semibold">
                     Cancelar
                 </a>

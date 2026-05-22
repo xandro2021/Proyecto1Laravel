@@ -47,7 +47,7 @@
                     <span id="viewModeLabel" class="small fw-semibold text-custom-primary"> Admin </span>
 
                     <a href="/user/catalogo" class="btn btn-link p-0 text-custom-primary">
-                        <span id="viewModeIcon" class="material-symbols-outlined" style="font-size: 32px;"></span>
+                        <span id="viewModeIcon" class="material-symbols-outlined" style="font-size: 32px;">swap_horiz</span>
                     </a>
 
                     <button class="btn btn-link text-custom-primary p-2">

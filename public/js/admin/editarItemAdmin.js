@@ -1,5 +1,5 @@
 // editarItemAdmin.js
-const API_BASE = 'http://localhost:8080';
+const API_BASE = 'http://127.0.0.1:8000/api';
 let selectedImage = null;
 let equipmentId = null;
 let currentImageFilename = null;
@@ -53,7 +53,7 @@ async function loadEquipment(id) {
 // ── Llenar el formulario con datos ────────────────────────
 function populateForm(equipment) {
   equipmentId = equipment.id;
-  currentImageFilename = equipment.imageFilename;
+  currentImageFilename = equipment.image_filename;
   console.log(equipment);
 
   document.getElementById('input-name').value = equipment.name;
@@ -70,9 +70,9 @@ function populateForm(equipment) {
   document.getElementById('summary-status').textContent = equipment.status;
 
   // Cargar imagen si existe
-  if (equipment.imageFilename) {
+  if (equipment.image_filename) {
     const imagePreview = document.querySelector('.aspect-square-custom');
-    imagePreview.style.backgroundImage = `url(/uploads/equipment/${equipment.imageFilename})`;
+    imagePreview.style.backgroundImage = `url(/uploads/equipment/${equipment.image_filename})`;
     imagePreview.style.backgroundSize = 'cover';
     imagePreview.style.backgroundPosition = 'center';
 

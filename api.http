@@ -3,7 +3,7 @@
 ### ========================================
 
 @baseUrl = http://127.0.0.1:8000/api
-@token = 4|aUIpYBmmJPnKdQHu0AwANVwXrAXjVWiisZa0REwFcf192eb4
+@token = 14|txxueILPOMS4bEoq7vW65lSoAP3bIeEPuKkm48YNca00dda2
 
 
 ### ========================================
@@ -118,7 +118,7 @@ Content-Type: image/jpeg
 ###
 
 ### Actualizar equipo
-PUT {{baseUrl}}/equipment/2
+PUT {{baseUrl}}/equipment/4
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json

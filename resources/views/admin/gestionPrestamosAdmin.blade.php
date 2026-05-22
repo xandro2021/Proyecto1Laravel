@@ -36,7 +36,7 @@
                 <nav class="d-none d-md-flex gap-4">
                     <a class="nav-link text-custom-primary" href="/admin/dashboard">Dashboard</a>
                     <a class="nav-link text-custom-primary" href="/admin/catalogo">Equipos</a>
-                    <a class="nav-link activetext-custom-primary" href="/admin/prestamos">Préstamos</a>
+                    <a class="nav-link active text-custom-primary" href="/admin/prestamos">Préstamos</a>
                     <!-- salir ir a login -->
                     <a class="nav-link text-custom-primary" href="#" onclick="logout()">Salir</a>
                 </nav>
@@ -47,7 +47,7 @@
                     <span id="viewModeLabel" class="small fw-semibold text-custom-primary"> Admin </span>
 
                     <a href="/user/catalogo" class="btn btn-link p-0 text-custom-primary">
-                        <span id="viewModeIcon" class="material-symbols-outlined" style="font-size: 32px;"></span>
+                        <span id="viewModeIcon" class="material-symbols-outlined" style="font-size: 32px;">swap_horiz</span>
                     </a>
 
                     <button class="btn btn-link text-custom-primary p-2">

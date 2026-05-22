@@ -38,7 +38,7 @@
                     <span id="viewModeLabel" class="small fw-semibold text-custom-primary"> Admin </span>
 
                     <a href="/user/catalogo" class="btn btn-link p-0 text-custom-primary">
-                        <span id="viewModeIcon" class="material-symbols-outlined" style="font-size: 32px;"></span>
+                        <span id="viewModeIcon" class="material-symbols-outlined" style="font-size: 32px;">swap_horiz</span>
                     </a>
 
                     <button class="btn btn-link text-custom-primary p-2">
@@ -218,15 +218,6 @@
                             <p class="text-muted small mt-1 mb-0">Escribe libremente o selecciona una sugerencia.</p>
                         </div>
 
-                        <!-- Número de serie -->
-                        <div th:if="${modo == 'editar'}" class="col-md-6">
-                            <label class="fw-bold text-custom-primary small text-uppercase mb-2">
-                                Número de Serie / ID de Activo
-                            </label>
-                            <input type="text" id="input-serial" class="form-custom-input w-100"
-                                placeholder="SN-XXXX-XXXX" disabled />
-                        </div>
-
                         <!-- Descripción -->
                         <div class="col-12">
                             <label class="fw-bold text-custom-primary small text-uppercase mb-2">
@@ -296,7 +287,7 @@
     <div class="grain-overlay"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/admin/editarItemAdmin.js"></script>
+    <script src="/js/admin/agregarItemAdmin.js"></script>
 
 </body>
 

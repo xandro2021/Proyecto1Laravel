@@ -224,7 +224,7 @@ function updateInfo() {
   info.textContent = `Mostrando ${showing} de ${total} préstamos`;
 }
 
-fetch("http://localhost:8080/loans/my", {
+fetch("http://localhost:8000/api/loans/my", {
   headers: {
     "Authorization": "Bearer " + localStorage.getItem("token")
   }
