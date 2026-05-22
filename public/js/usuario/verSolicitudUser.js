@@ -19,7 +19,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
 
-    // En Laravel NO existe /loans/my/{id}
     // Se usa directamente /api/loans/{id}
     const response = await fetch(
       `${API_BASE}/loans/${loanId}`,

@@ -6,18 +6,11 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+
 
 class UserController extends Controller
 {
-     public function __construct()
-    {
-        // 🔐 requiere login
-        $this->middleware('auth:sanctum');
-
-        // 🔐 solo ADMIN puede hacer todo esto
-        $this->middleware('role:ADMIN');
-    }
-
     public function index()
     {
         return User::all();
@@ -34,13 +27,13 @@ class UserController extends Controller
             'username' => 'required|string|max:255|unique:users',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
-            //'role' => 'required',
             'full_name' => 'required|string|max:255',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
 
-        $validated['role'] = 'ROLE_USER';
+        // rol fijo
+        $validated['role'] = 'USER';
 
         $user = User::create($validated);
 
@@ -49,6 +42,8 @@ class UserController extends Controller
 
     public function update(Request $request, string $id)
     {
+        $user = User::find($id);
+
         if (!$user) {
             return response()->json([
                 'error' => 'User not found'
@@ -89,7 +84,7 @@ class UserController extends Controller
     }
 
     public function destroy(string $id)
-     {
+    {
         $user = User::findOrFail($id);
 
         $user->delete();
@@ -99,7 +94,7 @@ class UserController extends Controller
 
     public function me()
     {
-        $user = auth()->user();
+        $user = Auth::user();
 
         if (!$user) {
             return response()->json([

@@ -151,7 +151,7 @@ Accept: application/json
 ###
 
 ### Obtener préstamo
-GET {{baseUrl}}/loans/3
+GET {{baseUrl}}/loans/1
 Authorization: Bearer {{token}}
 Accept: application/json
 
@@ -177,7 +177,7 @@ Accept: application/json
 ###
 
 ### Actualizar préstamo
-PUT {{baseUrl}}/loans/3
+PUT {{baseUrl}}/loans/1
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
@@ -189,7 +189,7 @@ Accept: application/json
 ###
 
 ### Eliminar préstamo
-DELETE {{baseUrl}}/loans/3
+DELETE {{baseUrl}}/loans/4
 Authorization: Bearer {{token}}
 Accept: application/json
 
@@ -229,7 +229,7 @@ Accept: application/json
 ###
 
 ### Actualizar usuario
-PUT {{baseUrl}}/users/3
+PUT {{baseUrl}}/users/5
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json

@@ -1,8 +1,11 @@
 <?php
 
+/* API ROUTES */
+
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\LoanController;
 use App\Http\Controllers\Api\EquipmentController;
@@ -63,5 +66,16 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Todo users solo ADMIN
     Route::apiResource('users', UserController::class)
+        ->middleware('role:ADMIN');
+
+    Route::get('/me', [UserController::class, 'me']);
+
+
+    /* DASHBOARD */
+
+    Route::get('/dashboard/stats', [DashboardController::class, 'stats'])
+        ->middleware('role:ADMIN');
+
+    Route::get('/dashboard/top-equipos', [DashboardController::class, 'topEquipos'])
         ->middleware('role:ADMIN');
 });
