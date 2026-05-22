@@ -19,6 +19,14 @@ class LoanController extends Controller
         return Loan::with(['equipment', 'user'])->get();
     }
 
+    public function myLoans()
+    {
+        return Loan::with(['equipment', 'user'])
+            ->where('user_id', Auth::id())
+            ->latest()
+            ->get();
+    }
+
     /**
      * Crear préstamo
      */

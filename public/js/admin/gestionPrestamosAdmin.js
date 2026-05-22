@@ -1,5 +1,7 @@
 // gestionPrestamosAdmin.js
-const API_URL = "/loans";
+const PUBLIC_BASE = "http://127.0.0.1:8000";
+const API_BASE = "http://127.0.0.1:8000/api";
+const API_URL = "http://127.0.0.1:8000/api/loans";
 const ITEMS_PER_PAGE = 4;
 
 let loans = [];
@@ -188,7 +190,7 @@ async function updateStatus(id, status) {
       status: status
     };
 
-    const res = await fetch(`/loans/${id}`, {
+      const res = await fetch(`${API_URL}/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -223,7 +225,7 @@ async function markAsReturned(id) {
   try {
     const token = localStorage.getItem("token");
 
-    const res = await fetch(`/loans/${id}`, {
+      const res = await fetch(`${API_URL}/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -253,7 +255,7 @@ function deleteLoan(id) {
 
   const token = localStorage.getItem("token");
 
-  fetch("/loans/" + id, {
+  fetch(`${API_URL}/${id}`, {
     method: "DELETE",
     headers: {
       "Authorization": "Bearer " + token

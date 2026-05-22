@@ -1,11 +1,19 @@
 // historialSolicitudesUser.js
-const API_URL = "/loans/my";
+
+const API_BASE = "http://127.0.0.1:8000/api";
+const PUBLIC_BASE = "http://127.0.0.1:8000";
+
+const API_URL = `${API_BASE}/loans/my`;
+
 const ITEMS_PER_PAGE = 4;
 
 let loans = [];
 let currentPage = 1;
 
-document.addEventListener("DOMContentLoaded", loadLoans);
+document.addEventListener("DOMContentLoaded", () => {
+  loadLoans();
+  loadStats();
+});
 
 async function loadLoans() {
   try {
@@ -13,7 +21,8 @@ async function loadLoans() {
 
     const res = await fetch(API_URL, {
       headers: {
-        "Authorization": "Bearer " + token
+        "Authorization": "Bearer " + token,
+        "Accept": "application/json"
       }
     });
 
@@ -22,9 +31,14 @@ async function loadLoans() {
       return;
     }
 
-    if (!res.ok) throw new Error("Error al cargar préstamos");
+    if (!res.ok) {
+      throw new Error("Error al cargar préstamos");
+    }
 
     loans = await res.json();
+
+    // más recientes primero
+    loans.reverse();
 
     renderPage(1);
     renderPagination();
@@ -36,115 +50,11 @@ async function loadLoans() {
   }
 }
 
-function renderLoans(loans) {
-  const tbody = document.getElementById("loansTableBody");
-  tbody.innerHTML = "";
-
-  if (loans.length === 0) {
-    tbody.innerHTML = `
-            <tr>
-                <td colspan="5" class="text-center py-4">
-                    No tienes solicitudes aún
-                </td>
-            </tr>
-        `;
-    return;
-  }
-
-  loans.forEach(loan => {
-    const row = createRow(loan);
-    tbody.appendChild(row);
-  });
-}
-
-function createRow(loan) {
-  const tr = document.createElement("tr");
-
-  const equipment = loan.equipment || {};
-
-  const imageUrl = equipment.imageFilename
-    ? `/uploads/equipment/${equipment.imageFilename}`
-    : "https://via.placeholder.com/60";
-
-  tr.innerHTML = `
-    <td>
-      <div class="d-flex align-items-center gap-3">
-        <div class="equipment-thumb">
-          <img src="${imageUrl}" alt="${equipment.name || 'Equipo'}" />
-        </div>
-        <div>
-          <p class="equipment-name mb-0">${equipment.name || 'Sin nombre'}</p>
-          <p class="equipment-id mb-0">ID: ${equipment.id || '-'}</p>
-        </div>
-      </div>
-    </td>
-
-    <td>${formatDate(loan.requestDate)}</td>
-    <td>${formatDate(loan.estimatedEndDate)}</td>
-
-    <td>${renderStatus(loan.status)}</td>
-
-    <td class="text-end">
-      <a href="/user/prestamos/detalle/${loan.id}" class="btn-action-primary">
-        Ver Detalles
-      </a>
-    </td>
-  `;
-
-  return tr;
-}
-
-function renderStatus(status) {
-  let className = "";
-  let text = status;
-
-  switch (status) {
-    case "APROBADO":
-      className = "badge-approved";
-      break;
-    case "PENDIENTE":
-      className = "badge-pending";
-      break;
-    case "RECHAZADO":
-      className = "badge-rejected";
-      break;
-    case "DEVUELTO":
-      className = "badge-returned";
-      break;
-  }
-
-  return `
-    <span class="badge-status ${className}">
-      <span class="badge-dot"></span>
-      ${text}
-    </span>
-  `;
-}
-
-function renderActions(loan) {
-  return `
-        <a href="/user/prestamos/detalle/${loan.id}" class="btn-action-primary">
-            Ver Detalles
-        </a>
-    `;
-}
-
-function formatDate(dateString) {
-  if (!dateString) return "-";
-
-  const date = new Date(dateString);
-
-  return date.toLocaleDateString("es-CR", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric"
-  });
-}
-
 function renderPage(page) {
   currentPage = page;
 
   const tbody = document.getElementById("loansTableBody");
+
   tbody.innerHTML = "";
 
   if (loans.length === 0) {
@@ -170,67 +80,250 @@ function renderPage(page) {
   updateInfo();
 }
 
+function createRow(loan) {
+
+  const tr = document.createElement("tr");
+
+  const equipment = loan.equipment || {};
+
+  // ← IMPORTANTE
+  // Laravel devuelve image_filename e image_url
+  const imageUrl = equipment.image_url
+    ? equipment.image_url
+    : "https://via.placeholder.com/60?text=IMG";
+
+  tr.innerHTML = `
+    <td>
+      <div class="d-flex align-items-center gap-3">
+
+        <div class="equipment-thumb">
+          <img
+            src="${imageUrl}"
+            alt="${equipment.name || 'Equipo'}"
+            style="
+              width:60px;
+              height:60px;
+              object-fit:cover;
+              border-radius:10px;
+              background:#f2f2f2;
+            "
+          />
+        </div>
+
+        <div>
+          <p class="equipment-name mb-0 fw-bold">
+            ${equipment.name || "Sin nombre"}
+          </p>
+
+          <p class="equipment-id mb-0 text-muted">
+            ID: ${equipment.id || "-"}
+          </p>
+        </div>
+
+      </div>
+    </td>
+
+    <td>
+      ${formatDate(loan.request_date)}
+    </td>
+
+    <td>
+      ${formatDate(loan.estimated_end_date)}
+    </td>
+
+    <td>
+      ${renderStatus(loan.status)}
+    </td>
+
+    <td class="text-end">
+      <a
+        href="/user/prestamos/detalle/${loan.id}"
+        class="btn-action-primary"
+      >
+        Ver Detalles
+      </a>
+    </td>
+  `;
+
+  return tr;
+}
+
+function renderStatus(status) {
+
+  let className = "";
+  let text = status;
+
+  switch (status) {
+
+    case "APROBADO":
+      className = "badge-approved";
+      text = "Aprobado";
+      break;
+
+    case "PENDIENTE":
+      className = "badge-pending";
+      text = "Pendiente";
+      break;
+
+    case "RECHAZADO":
+      className = "badge-rejected";
+      text = "Rechazado";
+      break;
+
+    case "PRESTADO":
+      className = "badge-approved";
+      text = "Prestado";
+      break;
+
+    case "DEVUELTO":
+      className = "badge-returned";
+      text = "Devuelto";
+      break;
+  }
+
+  return `
+    <span class="badge-status ${className}">
+      <span class="badge-dot"></span>
+      ${text}
+    </span>
+  `;
+}
+
+function formatDate(dateString) {
+
+  if (!dateString) return "-";
+
+  const date = new Date(dateString);
+
+  return date.toLocaleDateString("es-CR", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric"
+  });
+}
+
 function renderPagination() {
+
   const totalPages = Math.ceil(loans.length / ITEMS_PER_PAGE);
+
   const container = document.getElementById("pagination");
 
   container.innerHTML = "";
 
-  // Botón anterior
+  // anterior
   const prev = document.createElement("button");
+
   prev.className = "pag-btn icon-btn";
-  prev.innerHTML = `<span class="material-symbols-outlined">chevron_left</span>`;
+
+  prev.innerHTML = `
+    <span class="material-symbols-outlined">
+      chevron_left
+    </span>
+  `;
+
+  prev.disabled = currentPage === 1;
+
   prev.onclick = () => {
+
     if (currentPage > 1) {
+
       renderPage(currentPage - 1);
+
       renderPagination();
     }
   };
+
   container.appendChild(prev);
 
-  // Botones de páginas
+  // páginas
   for (let i = 1; i <= totalPages; i++) {
+
     const btn = document.createElement("button");
-    btn.className = "pag-btn " + (i === currentPage ? "active" : "");
+
+    btn.className = `
+      pag-btn
+      ${i === currentPage ? "active" : ""}
+    `;
+
     btn.innerText = i;
 
     btn.onclick = () => {
+
       renderPage(i);
+
       renderPagination();
     };
 
     container.appendChild(btn);
   }
 
-  // Botón siguiente
+  // siguiente
   const next = document.createElement("button");
+
   next.className = "pag-btn icon-btn";
-  next.innerHTML = `<span class="material-symbols-outlined">chevron_right</span>`;
+
+  next.innerHTML = `
+    <span class="material-symbols-outlined">
+      chevron_right
+    </span>
+  `;
+
+  next.disabled = currentPage === totalPages;
+
   next.onclick = () => {
+
     if (currentPage < totalPages) {
+
       renderPage(currentPage + 1);
+
       renderPagination();
     }
   };
+
   container.appendChild(next);
 }
 
 function updateInfo() {
+
   const info = document.querySelector(".page-info");
 
-  const total = loans.length;
-  const showing = Math.min(currentPage * ITEMS_PER_PAGE, total);
+  if (!info) return;
 
-  info.textContent = `Mostrando ${showing} de ${total} préstamos`;
+  const total = loans.length;
+
+  if (total === 0) {
+    info.textContent = "No hay préstamos";
+    return;
+  }
+
+  const start = (currentPage - 1) * ITEMS_PER_PAGE + 1;
+
+  const end = Math.min(
+    currentPage * ITEMS_PER_PAGE,
+    total
+  );
+
+  info.textContent = `
+    Mostrando ${start} - ${end} de ${total} préstamos
+  `;
 }
 
-fetch("http://localhost:8000/api/loans/my", {
-  headers: {
-    "Authorization": "Bearer " + localStorage.getItem("token")
-  }
-})
-  .then(res => res.json())
-  .then(data => {
+async function loadStats() {
+
+  try {
+
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(API_URL, {
+      headers: {
+        "Authorization": "Bearer " + token,
+        "Accept": "application/json"
+      }
+    });
+
+    if (!res.ok) return;
+
+    const data = await res.json();
 
     const total = data.length;
 
@@ -238,13 +331,46 @@ fetch("http://localhost:8000/api/loans/my", {
       l.status?.toUpperCase() === "PENDIENTE"
     ).length;
 
-    const enUso = data.filter(l =>
-      l.status?.toUpperCase() === "APROBADO"
+    const aprobados = data.filter(l =>
+      ["APROBADO", "PRESTADO"].includes(
+        l.status?.toUpperCase()
+      )
     ).length;
 
-    document.getElementById("pendientes").innerText = pendientes;
-    document.getElementById("aprobados").innerText = enUso;
-    document.getElementById("totalPrestamos").innerText = total;
+    const devueltos = data.filter(l =>
+      l.status?.toUpperCase() === "DEVUELTO"
+    ).length;
 
-  })
-  .catch(err => console.log(err));
+    const pendientesEl =
+      document.getElementById("pendientes");
+
+    const aprobadosEl =
+      document.getElementById("aprobados");
+
+    const totalEl =
+      document.getElementById("totalPrestamos");
+
+    const devueltosEl =
+      document.getElementById("devueltos");
+
+    if (pendientesEl) {
+      pendientesEl.innerText = pendientes;
+    }
+
+    if (aprobadosEl) {
+      aprobadosEl.innerText = aprobados;
+    }
+
+    if (totalEl) {
+      totalEl.innerText = total;
+    }
+
+    if (devueltosEl) {
+      devueltosEl.innerText = devueltos;
+    }
+
+  } catch (err) {
+
+    console.error(err);
+  }
+}

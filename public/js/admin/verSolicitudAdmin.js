@@ -1,5 +1,7 @@
 // verSolicitudAdmin.js
-const API_URL = "/loans";
+const PUBLIC_BASE = "http://127.0.0.1:8000";
+const API_BASE = "http://127.0.0.1:8000/api";
+const API_URL = "http://127.0.0.1:8000/api/loans";
 
 document.addEventListener("DOMContentLoaded", loadLoanDetail);
 
@@ -7,7 +9,7 @@ let currentLoan = null;
 
 async function loadLoanDetail() {
   try {
-    const token = localStorage.getItem("jwt");
+    const token = localStorage.getItem("token");
 
     const loanId = getLoanIdFromURL();
 
@@ -54,7 +56,7 @@ function renderLoan(loan) {
 function renderUser(user) {
   if (!user) return;
 
-  setText("Nombre Completo", user.fullName);
+  setText("Nombre Completo", user.full_name);
   setText("Correo de Contacto", user.email);
   setText("ID de Empleado", user.id);
   setText("Role", user.role);
@@ -67,18 +69,18 @@ function renderEquipment(equipment) {
   setText("Número de Serie", `ID: ${equipment.id}`);
   setText("Categoría", equipment.type);
 
-  // Imagen
   const img = document.querySelector(".equipment-img");
-  if (equipment.imageFilename) {
-    img.src = `/uploads/equipment/${equipment.imageFilename}`;
+
+  if (equipment.image_url) {
+    img.src = equipment.image_url;
   }
 }
 
 function renderDates(loan) {
-  setTextExact("Fecha de Solicitud", formatDate(loan.requestDate));
-  setTextExact("Devolución Estimada", formatDate(loan.estimatedEndDate));
+  setTextExact("Fecha de Solicitud", formatDate(loan.request_date));
+  setTextExact("Devolución Estimada", formatDate(loan.estimated_end_date));
 
-  renderDuration(loan.requestDate, loan.estimatedEndDate);
+  renderDuration(loan.request_date, loan.estimated_end_date);
 }
 
 function parseLocalDate(dateStr) {
@@ -261,14 +263,14 @@ function setupActionButtons(loan) {
 
 async function updateStatus(id, status) {
   try {
-    const token = localStorage.getItem("jwt");
+    const token = localStorage.getItem("token");
 
     const updatedLoan = {
       ...currentLoan,
       status: status
     };
 
-    const res = await fetch(`/loans/${id}`, {
+    const res = await fetch(`${API_BASE}/loans/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -288,7 +290,7 @@ async function updateStatus(id, status) {
       throw new Error(msg);
     }
 
-    await loadLoanDetail(); // recarga solo este préstamo
+    await loadLoanDetail();
 
   } catch (err) {
     console.error(err);
@@ -298,9 +300,9 @@ async function updateStatus(id, status) {
 
 async function markAsReturned(id) {
   try {
-    const token = localStorage.getItem("jwt");
+    const token = localStorage.getItem("token");
 
-    const res = await fetch(`/loans/${id}`, {
+    const res = await fetch(`${API_BASE}/loans/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -308,13 +310,15 @@ async function markAsReturned(id) {
       },
       body: JSON.stringify({
         status: "DEVUELTO",
-        actualReturnDate: new Date().toISOString().split("T")[0]
+        actual_return_date: new Date().toISOString().split("T")[0]
       })
     });
 
-    if (!res.ok) throw new Error("Error marcando como devuelto");
+    if (!res.ok) {
+      throw new Error("Error marcando como devuelto");
+    }
 
-    await loadLoanDetail(); // recarga vista
+    await loadLoanDetail();
 
   } catch (err) {
     console.error(err);

@@ -43,6 +43,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/loans', [LoanController::class, 'index'])
         ->middleware('role:ADMIN');
 
+    Route::get('/loans/my', [LoanController::class, 'myLoans'])
+        ->middleware('role:USER,ADMIN');
+
+    Route::get('/loans/{loan}', [LoanController::class, 'show'])
+        ->middleware('role:USER,ADMIN');
+
     Route::post('/loans', [LoanController::class, 'store'])
         ->middleware('role:USER,ADMIN');
 
@@ -51,9 +57,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::delete('/loans/{loan}', [LoanController::class, 'destroy'])
         ->middleware('role:ADMIN');
-
-    Route::get('/loans/{loan}', [LoanController::class, 'show'])
-        ->middleware('role:USER,ADMIN');
 
 
     /* USERS */
