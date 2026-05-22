@@ -1,7 +1,4 @@
 // userGuard.js
-
-const API_BASE = "http://127.0.0.1:8000/api";
-
 const token = localStorage.getItem("token");
 const role = localStorage.getItem("role");
 
@@ -20,7 +17,7 @@ if (!token || !["USER", "ADMIN"].includes(role)) {
 async function logout() {
   try {
     if (token) {
-      await fetch(`${API_BASE}/logout`, {
+      await fetch(`http://127.0.0.1:8000/api/logout`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
