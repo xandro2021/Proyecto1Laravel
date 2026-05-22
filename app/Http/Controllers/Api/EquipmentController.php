@@ -19,33 +19,29 @@ class EquipmentController extends Controller
 
     public function index()
     {
-        return Equipment::all();
+        return response()->json([
+            'message' => __('messages.equipment_list'),
+            'data' => Equipment::all()
+        ]);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-
             'type' => 'required|string|max:255',
-
             'description' => 'nullable|string',
-
             'stock' => 'required|integer|min:0',
-
             'status' => 'required|in:DISPONIBLE,OCUPADO,MANTENIMIENTO',
-
             'image' => 'nullable|image|max:2048'
         ]);
 
-        // regla negocio
         $validated['status'] =
             $this->applyBusinessRules(
                 $validated['stock'],
                 $validated['status']
             );
 
-        // guardar imagen
         if ($request->hasFile('image')) {
 
             $validated['image_filename'] =
@@ -56,12 +52,20 @@ class EquipmentController extends Controller
 
         $equipment = Equipment::create($validated);
 
-        return response()->json($equipment, 201);
+        return response()->json([
+            'message' => __('messages.equipment_created'),
+            'data' => $equipment
+        ], 201);
     }
 
     public function show(string $id)
     {
-        return Equipment::findOrFail($id);
+        $equipment = Equipment::findOrFail($id);
+
+        return response()->json([
+            'message' => __('messages.equipment_found'),
+            'data' => $equipment
+        ]);
     }
 
     public function update(
@@ -72,34 +76,25 @@ class EquipmentController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-
             'type' => 'required|string|max:255',
-
             'description' => 'nullable|string',
-
             'stock' => 'required|integer|min:0',
-
             'status' => 'required|in:DISPONIBLE,OCUPADO,MANTENIMIENTO',
-
             'image' => 'nullable|image|max:2048'
         ]);
 
-        // regla negocio
         $validated['status'] =
             $this->applyBusinessRules(
                 $validated['stock'],
                 $validated['status']
             );
 
-
         if ($request->hasFile('image')) {
 
-            // borrar anterior
             $this->imageService->deleteImage(
                 $equipment->image_filename
             );
 
-            // guardar nueva
             $validated['image_filename'] =
                 $this->imageService->saveImage(
                     $request->file('image')
@@ -108,21 +103,25 @@ class EquipmentController extends Controller
 
         $equipment->update($validated);
 
-        return $equipment;
+        return response()->json([
+            'message' => __('messages.equipment_updated'),
+            'data' => $equipment
+        ]);
     }
 
     public function destroy(string $id)
     {
         $equipment = Equipment::findOrFail($id);
 
-        // eliminar imagen
         $this->imageService->deleteImage(
             $equipment->image_filename
         );
 
         $equipment->delete();
 
-        return response()->noContent();
+        return response()->json([
+            'message' => __('messages.equipment_deleted')
+        ]);
     }
 
     private function applyBusinessRules(

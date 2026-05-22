@@ -11,25 +11,25 @@ use Illuminate\Support\Facades\Auth;
 
 class LoanController extends Controller
 {
-    /**
-     * Mostrar todos los préstamos
-     */
     public function index()
     {
-        return Loan::with(['equipment', 'user'])->get();
+        return response()->json([
+            'message' => __('messages.loan_list'),
+            'data' => Loan::with(['equipment', 'user'])->get()
+        ]);
     }
 
     public function myLoans()
     {
-        return Loan::with(['equipment', 'user'])
-            ->where('user_id', Auth::id())
-            ->latest()
-            ->get();
+        return response()->json([
+            'message' => __('messages.loan_list'),
+            'data' => Loan::with(['equipment', 'user'])
+                ->where('user_id', Auth::id())
+                ->latest()
+                ->get()
+        ]);
     }
 
-    /**
-     * Crear préstamo
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -40,23 +40,22 @@ class LoanController extends Controller
 
         $today = Carbon::today();
 
-        // validar fechas (Spring: requestDate vs estimatedEndDate)
         if ($today->gt(Carbon::parse($validated['estimated_end_date']))) {
+
             return response()->json([
-                'message' => 'Rango de fechas inválido'
+                'message' => __('messages.invalid_date_range')
             ], 400);
         }
 
         $equipment = Equipment::findOrFail($validated['equipment_id']);
 
-        // validar stock
         if ($equipment->stock <= 0) {
+
             return response()->json([
-                'message' => 'Sin stock'
+                'message' => __('messages.no_stock')
             ], 400);
         }
 
-        // ↓ reducir stock (igual que Spring)
         $equipment->stock -= 1;
         $equipment->save();
 
@@ -69,26 +68,32 @@ class LoanController extends Controller
             'user_id' => Auth::id(),
         ]);
 
-        return response()->json($loan, 201);
+        return response()->json([
+            'message' => __('messages.loan_created'),
+            'data' => $loan
+        ], 201);
     }
 
-    /**
-     * Mostrar préstamo por ID
-     */
     public function show(string $id)
     {
         $loan = Loan::with(['equipment', 'user'])->findOrFail($id);
 
-        if ($loan->user_id !== Auth::id() && auth()->user()->role !== 'ADMIN') {
-            abort(403, 'No autorizado');
+        if (
+            $loan->user_id !== Auth::id() &&
+            auth()->user()->role !== 'ADMIN'
+        ) {
+
+            return response()->json([
+                'message' => __('messages.unauthorized')
+            ], 403);
         }
 
-        return $loan;
+        return response()->json([
+            'message' => __('messages.loan_found'),
+            'data' => $loan
+        ]);
     }
 
-    /**
-     * Actualizar préstamo
-     */
     public function update(Request $request, string $id)
     {
         $loan = Loan::with('equipment')->findOrFail($id);
@@ -100,16 +105,16 @@ class LoanController extends Controller
         $nuevo = $validated['status'];
         $actual = $loan->status;
 
-        // validar transición (igual que Spring)
-        $this->validarTransicion($actual, $nuevo);
+        $error = $this->validarTransicion($actual, $nuevo);
+
+        if ($error) {
+            return response()->json([
+                'message' => $error
+            ], 400);
+        }
 
         $equipment = $loan->equipment;
 
-        // =========================
-        // EFECTOS DE TRANSICIÓN
-        // =========================
-
-        // RECHAZADO → devolver stock
         if (
             in_array($actual, ['PENDIENTE', 'APROBADO']) &&
             $nuevo === 'RECHAZADO'
@@ -118,25 +123,24 @@ class LoanController extends Controller
             $equipment->save();
         }
 
-        // APROBADO → PRESTADO
         if ($actual === 'APROBADO' && $nuevo === 'PRESTADO') {
             $loan->start_date = Carbon::today();
         }
 
-        // PRESTADO → DEVUELTO
         if ($actual === 'PRESTADO' && $nuevo === 'DEVUELTO') {
+
             $equipment->stock += 1;
             $equipment->save();
 
             $loan->actual_return_date = Carbon::today();
         }
 
-        // RECHAZADO → PENDIENTE (reevaluación)
         if ($actual === 'RECHAZADO' && $nuevo === 'PENDIENTE') {
 
             if ($equipment->stock <= 0) {
+
                 return response()->json([
-                    'message' => 'No hay stock para reevaluar'
+                    'message' => __('messages.no_stock_re_evaluation')
                 ], 400);
             }
 
@@ -147,50 +151,57 @@ class LoanController extends Controller
         $loan->status = $nuevo;
         $loan->save();
 
-        return $loan;
+        return response()->json([
+            'message' => __('messages.loan_updated'),
+            'data' => $loan
+        ]);
     }
 
-    /**
-     * Eliminar préstamo
-     */
     public function destroy(string $id)
     {
         Loan::destroy($id);
 
-        return response()->noContent();
+        return response()->json([
+            'message' => __('messages.loan_deleted')
+        ]);
     }
 
     private function validarTransicion($actual, $nuevo)
     {
-        if ($actual === $nuevo) return;
+        if ($actual === $nuevo) {
+            return null;
+        }
 
         switch ($actual) {
+
             case 'PENDIENTE':
                 if (!in_array($nuevo, ['APROBADO', 'RECHAZADO'])) {
-                    abort(400, "Transición inválida: $actual → $nuevo");
+                    return __('messages.invalid_transition');
                 }
                 break;
 
             case 'APROBADO':
                 if (!in_array($nuevo, ['PRESTADO', 'RECHAZADO'])) {
-                    abort(400, "Transición inválida: $actual → $nuevo");
+                    return __('messages.invalid_transition');
                 }
                 break;
 
             case 'PRESTADO':
                 if ($nuevo !== 'DEVUELTO') {
-                    abort(400, "Transición inválida: $actual → $nuevo");
+                    return __('messages.invalid_transition');
                 }
                 break;
 
             case 'RECHAZADO':
                 if ($nuevo !== 'PENDIENTE') {
-                    abort(400, "Transición inválida: $actual → $nuevo");
+                    return __('messages.invalid_transition');
                 }
                 break;
 
             case 'DEVUELTO':
-                abort(400, "No se puede modificar un préstamo DEVUELTO");
+                return __('messages.returned_loan_locked');
         }
+
+        return null;
     }
 }

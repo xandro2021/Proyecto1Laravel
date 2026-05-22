@@ -3,17 +3,40 @@
 ### ========================================
 
 @baseUrl = http://127.0.0.1:8000/api
-@token = 16|WsOPHInHu4mZKtN9uII6c8rnDmZXlIQhNAshcskp4306e56b
+
+# Reemplazar después del login
+@token = TU_TOKEN_AQUI
+
+# Idiomas:
+# es -> Español
+# en -> Inglés
+
+@langEs = es
+@langEn = en
 
 
 ### ========================================
 ### AUTH
 ### ========================================
 
-### Login ADMIN
+### Login ADMIN (ES)
 POST {{baseUrl}}/login
 Content-Type: application/json
 Accept: application/json
+Accept-Language: {{langEs}}
+
+{
+    "username": "admin",
+    "password": "admin"
+}
+
+###
+
+### Login ADMIN (EN)
+POST {{baseUrl}}/login
+Content-Type: application/json
+Accept: application/json
+Accept-Language: {{langEn}}
 
 {
     "username": "admin",
@@ -26,6 +49,7 @@ Accept: application/json
 POST {{baseUrl}}/login
 Content-Type: application/json
 Accept: application/json
+Accept-Language: {{langEs}}
 
 {
     "username": "user",
@@ -34,10 +58,24 @@ Accept: application/json
 
 ###
 
+### Login inválido (probar i18n)
+POST {{baseUrl}}/login
+Content-Type: application/json
+Accept: application/json
+Accept-Language: {{langEn}}
+
+{
+    "username": "fake",
+    "password": "wrong"
+}
+
+###
+
 ### Register
 POST {{baseUrl}}/register
 Content-Type: application/json
 Accept: application/json
+Accept-Language: {{langEs}}
 
 {
     "username": "jdoe",
@@ -46,6 +84,14 @@ Accept: application/json
     "full_name": "John Doe",
     "role": "USER"
 }
+
+###
+
+### Logout
+POST {{baseUrl}}/logout
+Authorization: Bearer {{token}}
+Accept: application/json
+Accept-Language: {{langEs}}
 
 
 ### ========================================
@@ -56,6 +102,15 @@ Accept: application/json
 GET {{baseUrl}}/equipment
 Authorization: Bearer {{token}}
 Accept: application/json
+Accept-Language: {{langEs}}
+
+###
+
+### Obtener todos (EN)
+GET {{baseUrl}}/equipment
+Authorization: Bearer {{token}}
+Accept: application/json
+Accept-Language: {{langEn}}
 
 ###
 
@@ -63,6 +118,7 @@ Accept: application/json
 GET {{baseUrl}}/equipment/1
 Authorization: Bearer {{token}}
 Accept: application/json
+Accept-Language: {{langEs}}
 
 ###
 
@@ -71,6 +127,7 @@ POST {{baseUrl}}/equipment
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
+Accept-Language: {{langEs}}
 
 {
     "name": "Laptop Dell XPS",
@@ -82,10 +139,28 @@ Accept: application/json
 
 ###
 
+### Crear equipo SIN imagen (EN)
+POST {{baseUrl}}/equipment
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Accept: application/json
+Accept-Language: {{langEn}}
+
+{
+    "name": "MacBook Pro",
+    "type": "Laptop",
+    "description": "High performance laptop",
+    "stock": 3,
+    "status": "DISPONIBLE"
+}
+
+###
+
 ### Crear equipo CON imagen
 POST {{baseUrl}}/equipment
 Authorization: Bearer {{token}}
 Accept: application/json
+Accept-Language: {{langEs}}
 Content-Type: multipart/form-data; boundary=boundary
 
 --boundary
@@ -118,10 +193,11 @@ Content-Type: image/jpeg
 ###
 
 ### Actualizar equipo
-PUT {{baseUrl}}/equipment/4
+PUT {{baseUrl}}/equipment/1
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
+Accept-Language: {{langEs}}
 
 {
     "name": "Thinkpad T14",
@@ -133,10 +209,36 @@ Accept: application/json
 
 ###
 
+### Actualizar equipo (EN)
+PUT {{baseUrl}}/equipment/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Accept: application/json
+Accept-Language: {{langEn}}
+
+{
+    "name": "Thinkpad T14 Gen 5",
+    "type": "Laptop",
+    "description": "Updated version",
+    "stock": 8,
+    "status": "DISPONIBLE"
+}
+
+###
+
 ### Eliminar equipo
-DELETE {{baseUrl}}/equipment/4
+DELETE {{baseUrl}}/equipment/1
 Authorization: Bearer {{token}}
 Accept: application/json
+Accept-Language: {{langEs}}
+
+###
+
+### Eliminar equipo (EN)
+DELETE {{baseUrl}}/equipment/2
+Authorization: Bearer {{token}}
+Accept: application/json
+Accept-Language: {{langEn}}
 
 
 ### ========================================
@@ -147,6 +249,7 @@ Accept: application/json
 GET {{baseUrl}}/loans
 Authorization: Bearer {{token}}
 Accept: application/json
+Accept-Language: {{langEs}}
 
 ###
 
@@ -154,6 +257,15 @@ Accept: application/json
 GET {{baseUrl}}/loans/1
 Authorization: Bearer {{token}}
 Accept: application/json
+Accept-Language: {{langEs}}
+
+###
+
+### Obtener mis préstamos
+GET {{baseUrl}}/my-loans
+Authorization: Bearer {{token}}
+Accept: application/json
+Accept-Language: {{langEs}}
 
 ###
 
@@ -162,25 +274,52 @@ POST {{baseUrl}}/loans
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
+Accept-Language: {{langEs}}
 
 {
-    "request_date": "2026-05-16",
-    "start_date": "2026-05-17",
-    "estimated_end_date": "2026-05-25",
-    "actual_return_date": null,
+    "estimated_end_date": "2026-05-30",
     "justification": "Necesario para trabajo remoto",
-    "status": "PENDIENTE",
-    "equipment_id": 1,
-    "user_id": 1
+    "equipment_id": 1
 }
 
 ###
 
-### Actualizar préstamo
+### Crear préstamo (EN)
+POST {{baseUrl}}/loans
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Accept: application/json
+Accept-Language: {{langEn}}
+
+{
+    "estimated_end_date": "2026-05-30",
+    "justification": "Needed for remote work",
+    "equipment_id": 1
+}
+
+###
+
+### Crear préstamo inválido (fecha pasada)
+POST {{baseUrl}}/loans
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Accept: application/json
+Accept-Language: {{langEn}}
+
+{
+    "estimated_end_date": "2020-01-01",
+    "justification": "Testing invalid range",
+    "equipment_id": 1
+}
+
+###
+
+### Actualizar préstamo -> APROBADO
 PUT {{baseUrl}}/loans/1
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
+Accept-Language: {{langEs}}
 
 {
     "status": "APROBADO"
@@ -188,10 +327,50 @@ Accept: application/json
 
 ###
 
+### Actualizar préstamo -> PRESTADO
+PUT {{baseUrl}}/loans/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Accept: application/json
+Accept-Language: {{langEs}}
+
+{
+    "status": "PRESTADO"
+}
+
+###
+
+### Actualizar préstamo -> DEVUELTO
+PUT {{baseUrl}}/loans/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Accept: application/json
+Accept-Language: {{langEn}}
+
+{
+    "status": "DEVUELTO"
+}
+
+###
+
+### Transición inválida
+PUT {{baseUrl}}/loans/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Accept: application/json
+Accept-Language: {{langEn}}
+
+{
+    "status": "PENDIENTE"
+}
+
+###
+
 ### Eliminar préstamo
-DELETE {{baseUrl}}/loans/4
+DELETE {{baseUrl}}/loans/1
 Authorization: Bearer {{token}}
 Accept: application/json
+Accept-Language: {{langEs}}
 
 
 ### ========================================
@@ -202,6 +381,7 @@ Accept: application/json
 GET {{baseUrl}}/users
 Authorization: Bearer {{token}}
 Accept: application/json
+Accept-Language: {{langEs}}
 
 ###
 
@@ -209,6 +389,7 @@ Accept: application/json
 GET {{baseUrl}}/users/3
 Authorization: Bearer {{token}}
 Accept: application/json
+Accept-Language: {{langEs}}
 
 ###
 
@@ -217,6 +398,7 @@ POST {{baseUrl}}/users
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
+Accept-Language: {{langEs}}
 
 {
     "username": "nuevo",
@@ -233,6 +415,7 @@ PUT {{baseUrl}}/users/5
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
+Accept-Language: {{langEs}}
 
 {
     "full_name": "Usuario Actualizado"
@@ -244,3 +427,4 @@ Accept: application/json
 DELETE {{baseUrl}}/users/3
 Authorization: Bearer {{token}}
 Accept: application/json
+Accept-Language: {{langEn}}

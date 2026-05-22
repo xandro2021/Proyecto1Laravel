@@ -26,9 +26,10 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
+            'message' => __('messages.register_success'),
             'user' => $user,
             'token' => $token
-        ]);
+        ], 201);
     }
 
     public function login(Request $request)
@@ -40,16 +41,20 @@ class AuthController extends Controller
 
         $user = User::where('username', $request->username)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (
+            !$user ||
+            !Hash::check($request->password, $user->password)
+        ) {
 
             return response()->json([
-                'message' => 'Credenciales inválidas'
+                'message' => __('messages.invalid_credentials')
             ], 401);
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
+            'message' => __('messages.login_success'),
             'user' => $user,
             'token' => $token
         ]);
@@ -60,7 +65,7 @@ class AuthController extends Controller
         $request->user()->tokens()->delete();
 
         return response()->json([
-            'message' => 'Logout exitoso'
+            'message' => __('messages.logout_success')
         ]);
     }
 }
