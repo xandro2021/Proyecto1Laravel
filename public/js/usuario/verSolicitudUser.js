@@ -54,7 +54,8 @@ async function loadLoan() {
             throw new Error(errorMessage);
         }
 
-        const loan = await response.json();
+        const responseData = await response.json();
+        const loan = responseData.data;
 
         renderLoan(loan);
 
@@ -130,8 +131,7 @@ function renderEquipment(equipment) {
 
     if (img) {
         img.src =
-            equipment.image_url ||
-            "/img/no-image.png";
+            equipment.image_url || "https://via.placeholder.com/400x300"
 
         img.alt =
             equipment.name || "Equipo";

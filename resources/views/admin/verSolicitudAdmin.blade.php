@@ -80,7 +80,7 @@
         <!-- Acciones del encabezado -->
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-5">
             <div class="d-flex align-items-center gap-3">
-                <a th:href="@{/admin/prestamos}" class="back-btn">
+                <a href="/admin/prestamos" class="back-btn">
                     <span class="material-symbols-outlined">arrow_back</span>
                     <span>Volver a la Lista</span>
                 </a>

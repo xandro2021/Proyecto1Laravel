@@ -10,6 +10,8 @@ class Equipment extends Model
     protected $table = 'equipment';
     protected $appends = ['image_url'];
 
+    protected $hidden = [];
+
 
     protected $fillable = [
         'name',
@@ -34,13 +36,8 @@ class Equipment extends Model
 
     public function getImageUrlAttribute()
     {
-        if (!$this->image_filename) {
-            return null;
-        }
-
-        return asset(
-            'uploads/equipment/' .
-                $this->image_filename
-        );
+        return $this->image_filename
+            ? asset('uploads/equipment/' . $this->image_filename)
+            : asset('img/no-image.png');
     }
 }

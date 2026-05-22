@@ -1,8 +1,5 @@
 // catalogoUser.js
 (() => {
-
-    alert('funciona');
-    console.log('hola');
     const API_URL = "http://127.0.0.1:8000/api/equipment";
     const ITEMS_PER_PAGE = 8;
 
