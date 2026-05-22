@@ -1,41 +1,59 @@
 // adminGuard.js
-console.log('token:', localStorage.getItem('token'));
-console.log('role:', localStorage.getItem('role'));
 
-const token = localStorage.getItem('token');
+const token = localStorage.getItem("token");
+const role = localStorage.getItem("role");
 
-const role = localStorage.getItem('role');
+// Debug opcional
+console.log("token:", token);
+console.log("role:", role);
 
-if (!token || role !== 'ADMIN') {
+// ─────────────────────────────────────────────
+// Verificar sesión admin
+// ─────────────────────────────────────────────
+function validateAdminSession() {
+    if (!token || role !== "ADMIN") {
+        console.warn(
+            "Redirigiendo: sesión de administrador inválida."
+        );
 
-  console.log('Redirecting to login — no valid admin session');
+        clearSession();
 
-  window.location.href = '/';
+        window.location.href = "/";
+    }
 }
 
+// ─────────────────────────────────────────────
+// Limpiar sesión
+// ─────────────────────────────────────────────
+function clearSession() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("user");
+}
+
+// ─────────────────────────────────────────────
+// Logout
+// ─────────────────────────────────────────────
 async function logout() {
-
-  const token = localStorage.getItem('token');
-
-  try {
-
-    await fetch('/api/logout', {
-      method: 'POST',
-
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Accept': 'application/json'
-      }
-    });
-
-  } finally {
-
-    localStorage.removeItem('token');
-
-    localStorage.removeItem('role');
-
-    localStorage.removeItem('user');
-
-    window.location.href = '/';
-  }
+    try {
+        if (token) {
+            await fetch("/api/logout", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Accept": "application/json"
+                }
+            });
+        }
+    } catch (error) {
+        console.error("Error cerrando sesión:", error);
+    } finally {
+        clearSession();
+        window.location.href = "/";
+    }
 }
+
+// ─────────────────────────────────────────────
+// Inicializar protección
+// ─────────────────────────────────────────────
+validateAdminSession();

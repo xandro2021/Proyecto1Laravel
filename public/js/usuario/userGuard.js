@@ -1,41 +1,40 @@
 // userGuard.js
-console.log('token:', localStorage.getItem('token'));
-console.log('role:', localStorage.getItem('role'));
 
-const token = localStorage.getItem('token');
+const API_BASE = "http://127.0.0.1:8000/api";
 
-const role = localStorage.getItem('role');
+const token = localStorage.getItem("token");
+const role = localStorage.getItem("role");
 
-if (!token || (role !== 'USER' && role !== 'ADMIN')) {
+// Validar sesión
+if (!token || !["USER", "ADMIN"].includes(role)) {
+  console.warn("Sesión inválida. Redirigiendo al login...");
 
-  console.log('Redirecting to login — no valid user session');
+  localStorage.removeItem("token");
+  localStorage.removeItem("role");
+  localStorage.removeItem("user");
 
-  window.location.href = '/';
+  window.location.href = "/";
 }
 
+// Logout
 async function logout() {
-
-  const token = localStorage.getItem('token');
-
   try {
-
-    await fetch('/api/logout', {
-      method: 'POST',
-
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Accept': 'application/json'
-      }
-    });
-
+    if (token) {
+      await fetch(`${API_BASE}/logout`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json"
+        }
+      });
+    }
+  } catch (error) {
+    console.error("Error cerrando sesión:", error);
   } finally {
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("user");
 
-    localStorage.removeItem('token');
-
-    localStorage.removeItem('role');
-
-    localStorage.removeItem('user');
-
-    window.location.href = '/';
+    window.location.href = "/";
   }
 }

@@ -1,7 +1,8 @@
 // verSolicitudAdmin.js
+
 const PUBLIC_BASE = "http://127.0.0.1:8000";
 const API_BASE = "http://127.0.0.1:8000/api";
-const API_URL = "http://127.0.0.1:8000/api/loans";
+const API_URL = `${API_BASE}/loans`;
 
 document.addEventListener("DOMContentLoaded", loadLoanDetail);
 
@@ -10,12 +11,11 @@ let currentLoan = null;
 async function loadLoanDetail() {
   try {
     const token = localStorage.getItem("token");
-
     const loanId = getLoanIdFromURL();
 
     const res = await fetch(`${API_URL}/${loanId}`, {
       headers: {
-        "Authorization": "Bearer " + token
+        "Authorization": `Bearer ${token}`
       }
     });
 
@@ -24,9 +24,16 @@ async function loadLoanDetail() {
       return;
     }
 
-    if (!res.ok) throw new Error("Error cargando detalle");
+    if (!res.ok) {
+      throw new Error("Error cargando detalle");
+    }
 
-    const loan = await res.json();
+    const response = await res.json();
+
+    // Laravel ahora devuelve:
+    // { message: "...", data: {...} }
+
+    const loan = response.data || response;
 
     renderLoan(loan);
 
@@ -56,36 +63,46 @@ function renderLoan(loan) {
 function renderUser(user) {
   if (!user) return;
 
-  setText("Nombre Completo", user.full_name);
-  setText("Correo de Contacto", user.email);
-  setText("ID de Empleado", user.id);
-  setText("Role", user.role);
+  setText("Nombre Completo", user.full_name || user.username || "-");
+  setText("Correo de Contacto", user.email || "-");
+  setText("ID de Empleado", user.id || "-");
+  setText("Role", user.role || "-");
 }
 
 function renderEquipment(equipment) {
   if (!equipment) return;
 
-  setText("Nombre del Equipo", equipment.name);
-  setText("Número de Serie", `ID: ${equipment.id}`);
-  setText("Categoría", equipment.type);
+  setText("Nombre del Equipo", equipment.name || "-");
+  setText("Número de Serie", `ID: ${equipment.id || "-"}`);
+  setText("Categoría", equipment.type || "-");
 
   const img = document.querySelector(".equipment-img");
 
-  if (equipment.image_url) {
+  if (img && equipment.image_url) {
     img.src = equipment.image_url;
   }
 }
 
 function renderDates(loan) {
-  setTextExact("Fecha de Solicitud", formatDate(loan.request_date));
-  setTextExact("Devolución Estimada", formatDate(loan.estimated_end_date));
+  const requestDate =
+    loan.request_date || loan.requestDate;
 
-  renderDuration(loan.request_date, loan.estimated_end_date);
+  const estimatedEndDate =
+    loan.estimated_end_date || loan.estimatedEndDate;
+
+  setTextExact("Fecha de Solicitud", formatDate(requestDate));
+
+  setTextExact(
+    "Devolución Estimada",
+    formatDate(estimatedEndDate)
+  );
+
+  renderDuration(requestDate, estimatedEndDate);
 }
 
 function parseLocalDate(dateStr) {
   const [year, month, day] = dateStr.split("-");
-  return new Date(year, month - 1, day); // local, no UTC
+  return new Date(year, month - 1, day);
 }
 
 function renderDuration(startDateStr, endDateStr) {
@@ -110,6 +127,8 @@ function renderDuration(startDateStr, endDateStr) {
 function renderStatus(status) {
   const badge = document.querySelector(".status-badge");
 
+  if (!badge) return;
+
   let icon = "info";
   let text = status;
 
@@ -118,18 +137,22 @@ function renderStatus(status) {
       icon = "schedule";
       text = "Pendiente";
       break;
+
     case "APROBADO":
       icon = "check_circle";
       text = "Aprobado";
       break;
+
     case "PRESTADO":
       icon = "inventory_2";
       text = "Prestado";
       break;
+
     case "RECHAZADO":
       icon = "cancel";
       text = "Rechazado";
       break;
+
     case "DEVUELTO":
       icon = "done_all";
       text = "Devuelto";
@@ -144,31 +167,36 @@ function renderStatus(status) {
 
 function renderJustification(text) {
   const el = document.querySelector(".purpose-quote");
-  if (el && text) {
-    el.textContent = `"${text}"`;
+
+  if (el) {
+    el.textContent = text ? `"${text}"` : '"Sin justificación"';
   }
 }
 
-// Busca label y pone valor (flexible)
 function setText(label, value) {
   const labels = document.querySelectorAll(".field-label");
 
   labels.forEach(l => {
     if (l.textContent.includes(label)) {
       const target = l.nextElementSibling;
-      if (target) target.textContent = value || "-";
+
+      if (target) {
+        target.textContent = value || "-";
+      }
     }
   });
 }
 
-// Para casos donde hay duplicados (fechas)
 function setTextExact(label, value) {
   const labels = document.querySelectorAll(".field-label");
 
   labels.forEach(l => {
     if (l.textContent.trim() === label) {
       const target = l.nextElementSibling;
-      if (target) target.textContent = value || "-";
+
+      if (target) {
+        target.textContent = value || "-";
+      }
     }
   });
 }
@@ -206,13 +234,19 @@ function setupActionButtons(loan) {
         <span class="material-symbols-outlined">check_circle</span>
         Aprobar Préstamo
       `;
+
       actionBtn.className = "btn-approve";
-      actionBtn.onclick = () => updateStatus(loan.id, "APROBADO");
+
+      actionBtn.onclick = () =>
+        updateStatus(loan.id, "APROBADO");
 
       if (rejectBtn) {
         rejectBtn.style.display = "block";
-        rejectBtn.onclick = () => updateStatus(loan.id, "RECHAZADO");
+
+        rejectBtn.onclick = () =>
+          updateStatus(loan.id, "RECHAZADO");
       }
+
       break;
 
     case "APROBADO":
@@ -220,13 +254,19 @@ function setupActionButtons(loan) {
         <span class="material-symbols-outlined">inventory_2</span>
         Entregar al cliente
       `;
+
       actionBtn.className = "btn-approve";
-      actionBtn.onclick = () => updateStatus(loan.id, "PRESTADO");
+
+      actionBtn.onclick = () =>
+        updateStatus(loan.id, "PRESTADO");
 
       if (rejectBtn) {
         rejectBtn.style.display = "block";
-        rejectBtn.onclick = () => updateStatus(loan.id, "RECHAZADO");
+
+        rejectBtn.onclick = () =>
+          updateStatus(loan.id, "RECHAZADO");
       }
+
       break;
 
     case "PRESTADO":
@@ -234,12 +274,12 @@ function setupActionButtons(loan) {
         <span class="material-symbols-outlined">assignment_return</span>
         Marcar como devuelto
       `;
-      actionBtn.className = "btn-return";
-      actionBtn.onclick = () => markAsReturned(loan.id);
 
-      if (rejectBtn) {
-        rejectBtn.style.display = "none";
-      }
+      actionBtn.className = "btn-return";
+
+      actionBtn.onclick = () =>
+        markAsReturned(loan.id);
+
       break;
 
     case "RECHAZADO":
@@ -247,8 +287,12 @@ function setupActionButtons(loan) {
         <span class="material-symbols-outlined">refresh</span>
         Re-evaluar
       `;
+
       actionBtn.className = "btn-reevaluate";
-      actionBtn.onclick = () => updateStatus(loan.id, "PENDIENTE");
+
+      actionBtn.onclick = () =>
+        updateStatus(loan.id, "PENDIENTE");
+
       break;
 
     case "DEVUELTO":
@@ -256,7 +300,9 @@ function setupActionButtons(loan) {
         <span class="material-symbols-outlined">done</span>
         Devuelto
       `;
+
       actionBtn.disabled = true;
+
       break;
   }
 }
@@ -267,25 +313,32 @@ async function updateStatus(id, status) {
 
     const updatedLoan = {
       ...currentLoan,
-      status: status
+      status
     };
 
     const res = await fetch(`${API_BASE}/loans/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer " + token
+        "Authorization": `Bearer ${token}`
       },
       body: JSON.stringify(updatedLoan)
     });
+
+    if (res.status === 401 || res.status === 403) {
+      window.location.href = "/";
+      return;
+    }
 
     if (!res.ok) {
       let msg = "Error actualizando estado";
 
       try {
-        const data = await res.json();
-        msg = data.message || msg;
-      } catch {}
+        const errorData = await res.json();
+
+        msg = errorData.message || msg;
+
+      } catch (_) {}
 
       throw new Error(msg);
     }
@@ -306,13 +359,20 @@ async function markAsReturned(id) {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer " + token
+        "Authorization": `Bearer ${token}`
       },
       body: JSON.stringify({
         status: "DEVUELTO",
-        actual_return_date: new Date().toISOString().split("T")[0]
+        actual_return_date: new Date()
+          .toISOString()
+          .split("T")[0]
       })
     });
+
+    if (res.status === 401 || res.status === 403) {
+      window.location.href = "/";
+      return;
+    }
 
     if (!res.ok) {
       throw new Error("Error marcando como devuelto");

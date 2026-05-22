@@ -10,18 +10,26 @@ const ITEMS_PER_PAGE = 4;
 let loans = [];
 let currentPage = 1;
 
-document.addEventListener("DOMContentLoaded", () => {
-  loadLoans();
+// ─────────────────────────────────────────────
+// Inicializar
+// ─────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", async () => {
+  await loadLoans();
   loadStats();
 });
 
+// ─────────────────────────────────────────────
+// Cargar préstamos
+// ─────────────────────────────────────────────
 async function loadLoans() {
+
   try {
+
     const token = localStorage.getItem("token");
 
     const res = await fetch(API_URL, {
       headers: {
-        "Authorization": "Bearer " + token,
+        "Authorization": `Bearer ${token}`,
         "Accept": "application/json"
       }
     });
@@ -35,7 +43,12 @@ async function loadLoans() {
       throw new Error("Error al cargar préstamos");
     }
 
-    loans = await res.json();
+    const response = await res.json();
+
+    // Laravel ahora devuelve:
+    // { message: "...", data: [...] }
+
+    loans = response.data || [];
 
     // más recientes primero
     loans.reverse();
@@ -45,19 +58,38 @@ async function loadLoans() {
     updateInfo();
 
   } catch (err) {
+
     console.error(err);
-    alert("Error cargando historial");
+
+    const tbody = document.getElementById("loansTableBody");
+
+    if (tbody) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" class="text-center text-danger py-4">
+            Error cargando historial
+          </td>
+        </tr>
+      `;
+    }
   }
 }
 
+// ─────────────────────────────────────────────
+// Renderizar página
+// ─────────────────────────────────────────────
 function renderPage(page) {
+
   currentPage = page;
 
   const tbody = document.getElementById("loansTableBody");
 
+  if (!tbody) return;
+
   tbody.innerHTML = "";
 
   if (loans.length === 0) {
+
     tbody.innerHTML = `
       <tr>
         <td colspan="5" class="text-center py-4">
@@ -65,6 +97,7 @@ function renderPage(page) {
         </td>
       </tr>
     `;
+
     return;
   }
 
@@ -80,17 +113,24 @@ function renderPage(page) {
   updateInfo();
 }
 
+// ─────────────────────────────────────────────
+// Crear fila
+// ─────────────────────────────────────────────
 function createRow(loan) {
 
   const tr = document.createElement("tr");
 
   const equipment = loan.equipment || {};
 
-  // ← IMPORTANTE
-  // Laravel devuelve image_filename e image_url
-  const imageUrl = equipment.image_url
-    ? equipment.image_url
-    : "https://via.placeholder.com/60?text=IMG";
+  const imageUrl =
+    equipment.image_url ||
+    "https://via.placeholder.com/60?text=IMG";
+
+  const requestDate =
+    loan.request_date || loan.requestDate;
+
+  const estimatedEndDate =
+    loan.estimated_end_date || loan.estimatedEndDate;
 
   tr.innerHTML = `
     <td>
@@ -124,11 +164,11 @@ function createRow(loan) {
     </td>
 
     <td>
-      ${formatDate(loan.request_date)}
+      ${formatDate(requestDate)}
     </td>
 
     <td>
-      ${formatDate(loan.estimated_end_date)}
+      ${formatDate(estimatedEndDate)}
     </td>
 
     <td>
@@ -148,10 +188,13 @@ function createRow(loan) {
   return tr;
 }
 
+// ─────────────────────────────────────────────
+// Render status
+// ─────────────────────────────────────────────
 function renderStatus(status) {
 
   let className = "";
-  let text = status;
+  let text = status || "DESCONOCIDO";
 
   switch (status) {
 
@@ -189,6 +232,9 @@ function renderStatus(status) {
   `;
 }
 
+// ─────────────────────────────────────────────
+// Formatear fecha
+// ─────────────────────────────────────────────
 function formatDate(dateString) {
 
   if (!dateString) return "-";
@@ -202,15 +248,27 @@ function formatDate(dateString) {
   });
 }
 
+// ─────────────────────────────────────────────
+// Render paginación
+// ─────────────────────────────────────────────
 function renderPagination() {
 
-  const totalPages = Math.ceil(loans.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(
+    loans.length / ITEMS_PER_PAGE
+  );
 
-  const container = document.getElementById("pagination");
+  const container =
+    document.getElementById("pagination");
+
+  if (!container) return;
 
   container.innerHTML = "";
 
-  // anterior
+  if (totalPages <= 1) {
+    return;
+  }
+
+  // ── anterior ──
   const prev = document.createElement("button");
 
   prev.className = "pag-btn icon-btn";
@@ -235,15 +293,13 @@ function renderPagination() {
 
   container.appendChild(prev);
 
-  // páginas
+  // ── páginas ──
   for (let i = 1; i <= totalPages; i++) {
 
     const btn = document.createElement("button");
 
-    btn.className = `
-      pag-btn
-      ${i === currentPage ? "active" : ""}
-    `;
+    btn.className =
+      `pag-btn ${i === currentPage ? "active" : ""}`;
 
     btn.innerText = i;
 
@@ -257,7 +313,7 @@ function renderPagination() {
     container.appendChild(btn);
   }
 
-  // siguiente
+  // ── siguiente ──
   const next = document.createElement("button");
 
   next.className = "pag-btn icon-btn";
@@ -283,6 +339,9 @@ function renderPagination() {
   container.appendChild(next);
 }
 
+// ─────────────────────────────────────────────
+// Info de paginación
+// ─────────────────────────────────────────────
 function updateInfo() {
 
   const info = document.querySelector(".page-info");
@@ -292,22 +351,27 @@ function updateInfo() {
   const total = loans.length;
 
   if (total === 0) {
+
     info.textContent = "No hay préstamos";
+
     return;
   }
 
-  const start = (currentPage - 1) * ITEMS_PER_PAGE + 1;
+  const start =
+    (currentPage - 1) * ITEMS_PER_PAGE + 1;
 
   const end = Math.min(
     currentPage * ITEMS_PER_PAGE,
     total
   );
 
-  info.textContent = `
-    Mostrando ${start} - ${end} de ${total} préstamos
-  `;
+  info.textContent =
+    `Mostrando ${start} - ${end} de ${total} préstamos`;
 }
 
+// ─────────────────────────────────────────────
+// Cargar estadísticas
+// ─────────────────────────────────────────────
 async function loadStats() {
 
   try {
@@ -316,14 +380,16 @@ async function loadStats() {
 
     const res = await fetch(API_URL, {
       headers: {
-        "Authorization": "Bearer " + token,
+        "Authorization": `Bearer ${token}`,
         "Accept": "application/json"
       }
     });
 
     if (!res.ok) return;
 
-    const data = await res.json();
+    const response = await res.json();
+
+    const data = response.data || [];
 
     const total = data.length;
 
