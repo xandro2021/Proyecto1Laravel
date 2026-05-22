@@ -1,6 +1,6 @@
 <?php
 
-/* API ROUTES */
+/* routes/api.php */
 
 use Illuminate\Support\Facades\Route;
 
@@ -10,72 +10,71 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\LoanController;
 use App\Http\Controllers\Api\EquipmentController;
 
-/* AUTH */
 
-Route::post('/login', [AuthController::class, 'login']);
+Route::middleware('locale')->group(function () {
 
-Route::post('/register', [AuthController::class, 'register']);
+    /* AUTH */
 
+    Route::post('/login', [AuthController::class, 'login']);
 
-/* PROTEGIDAS */
+    Route::post('/register', [AuthController::class, 'register']);
 
-Route::middleware(['locale', 'auth:sanctum'])->group(function () {
+    /* PROTEGIDAS */
 
-    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::middleware('auth:sanctum')->group(function () {
 
-    /* EQUIPMENT */
+        Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::get('/equipment', [EquipmentController::class, 'index'])
-        ->middleware('role:USER,ADMIN');
+        /* EQUIPMENT */
 
-    Route::get('/equipment/{equipment}', [EquipmentController::class, 'show'])
-        ->middleware('role:USER,ADMIN');
+        Route::get('/equipment', [EquipmentController::class, 'index'])
+            ->middleware('role:USER,ADMIN');
 
-    Route::post('/equipment', [EquipmentController::class, 'store'])
-        ->middleware('role:ADMIN');
+        Route::get('/equipment/{equipment}', [EquipmentController::class, 'show'])
+            ->middleware('role:USER,ADMIN');
 
-    Route::put('/equipment/{equipment}', [EquipmentController::class, 'update'])
-        ->middleware('role:ADMIN');
+        Route::post('/equipment', [EquipmentController::class, 'store'])
+            ->middleware('role:ADMIN');
 
-    Route::delete('/equipment/{equipment}', [EquipmentController::class, 'destroy'])
-        ->middleware('role:ADMIN');
+        Route::put('/equipment/{equipment}', [EquipmentController::class, 'update'])
+            ->middleware('role:ADMIN');
 
+        Route::delete('/equipment/{equipment}', [EquipmentController::class, 'destroy'])
+            ->middleware('role:ADMIN');
 
-    /* LOANS */
+        /* LOANS */
 
-    Route::get('/loans', [LoanController::class, 'index'])
-        ->middleware('role:ADMIN');
+        Route::get('/loans', [LoanController::class, 'index'])
+            ->middleware('role:ADMIN');
 
-    Route::get('/loans/my', [LoanController::class, 'myLoans'])
-        ->middleware('role:USER,ADMIN');
+        Route::get('/loans/my', [LoanController::class, 'myLoans'])
+            ->middleware('role:USER,ADMIN');
 
-    Route::get('/loans/{loan}', [LoanController::class, 'show'])
-        ->middleware('role:USER,ADMIN');
+        Route::get('/loans/{loan}', [LoanController::class, 'show'])
+            ->middleware('role:USER,ADMIN');
 
-    Route::post('/loans', [LoanController::class, 'store'])
-        ->middleware('role:USER,ADMIN');
+        Route::post('/loans', [LoanController::class, 'store'])
+            ->middleware('role:USER,ADMIN');
 
-    Route::put('/loans/{loan}', [LoanController::class, 'update'])
-        ->middleware('role:ADMIN');
+        Route::put('/loans/{loan}', [LoanController::class, 'update'])
+            ->middleware('role:ADMIN');
 
-    Route::delete('/loans/{loan}', [LoanController::class, 'destroy'])
-        ->middleware('role:ADMIN');
+        Route::delete('/loans/{loan}', [LoanController::class, 'destroy'])
+            ->middleware('role:ADMIN');
 
+        /* USERS */
 
-    /* USERS */
+        Route::apiResource('users', UserController::class)
+            ->middleware('role:ADMIN');
 
-    // Todo users solo ADMIN
-    Route::apiResource('users', UserController::class)
-        ->middleware('role:ADMIN');
+        Route::get('/me', [UserController::class, 'me']);
 
-    Route::get('/me', [UserController::class, 'me']);
+        /* DASHBOARD */
 
+        Route::get('/dashboard/stats', [DashboardController::class, 'stats'])
+            ->middleware('role:ADMIN');
 
-    /* DASHBOARD */
-
-    Route::get('/dashboard/stats', [DashboardController::class, 'stats'])
-        ->middleware('role:ADMIN');
-
-    Route::get('/dashboard/top-equipos', [DashboardController::class, 'topEquipos'])
-        ->middleware('role:ADMIN');
+        Route::get('/dashboard/top-equipos', [DashboardController::class, 'topEquipos'])
+            ->middleware('role:ADMIN');
+    });
 });

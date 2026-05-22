@@ -5,38 +5,23 @@
 @baseUrl = http://127.0.0.1:8000/api
 
 # Reemplazar después del login
-@token = TU_TOKEN_AQUI
+@token = 31|YZxLm44ZA1I1ONXX5RAwMUPuFWKd9EbbsVDHLXatbacee558
 
-# Idiomas:
+# Cambiar entre:
 # es -> Español
-# en -> Inglés
-
-@langEs = es
-@langEn = en
+# en -> English
+@lang = en
 
 
 ### ========================================
 ### AUTH
 ### ========================================
 
-### Login ADMIN (ES)
+### Login ADMIN
 POST {{baseUrl}}/login
 Content-Type: application/json
 Accept: application/json
-Accept-Language: {{langEs}}
-
-{
-    "username": "admin",
-    "password": "admin"
-}
-
-###
-
-### Login ADMIN (EN)
-POST {{baseUrl}}/login
-Content-Type: application/json
-Accept: application/json
-Accept-Language: {{langEn}}
+Accept-Language: {{lang}}
 
 {
     "username": "admin",
@@ -49,7 +34,7 @@ Accept-Language: {{langEn}}
 POST {{baseUrl}}/login
 Content-Type: application/json
 Accept: application/json
-Accept-Language: {{langEs}}
+Accept-Language: {{lang}}
 
 {
     "username": "user",
@@ -62,7 +47,7 @@ Accept-Language: {{langEs}}
 POST {{baseUrl}}/login
 Content-Type: application/json
 Accept: application/json
-Accept-Language: {{langEn}}
+Accept-Language: {{lang}}
 
 {
     "username": "fake",
@@ -75,7 +60,7 @@ Accept-Language: {{langEn}}
 POST {{baseUrl}}/register
 Content-Type: application/json
 Accept: application/json
-Accept-Language: {{langEs}}
+Accept-Language: {{lang}}
 
 {
     "username": "jdoe",
@@ -91,7 +76,7 @@ Accept-Language: {{langEs}}
 POST {{baseUrl}}/logout
 Authorization: Bearer {{token}}
 Accept: application/json
-Accept-Language: {{langEs}}
+Accept-Language: {{lang}}
 
 
 ### ========================================
@@ -102,23 +87,15 @@ Accept-Language: {{langEs}}
 GET {{baseUrl}}/equipment
 Authorization: Bearer {{token}}
 Accept: application/json
-Accept-Language: {{langEs}}
-
-###
-
-### Obtener todos (EN)
-GET {{baseUrl}}/equipment
-Authorization: Bearer {{token}}
-Accept: application/json
-Accept-Language: {{langEn}}
+Accept-Language: {{lang}}
 
 ###
 
 ### Obtener por ID
-GET {{baseUrl}}/equipment/1
+GET {{baseUrl}}/equipment/6
 Authorization: Bearer {{token}}
 Accept: application/json
-Accept-Language: {{langEs}}
+Accept-Language: {{lang}}
 
 ###
 
@@ -127,7 +104,7 @@ POST {{baseUrl}}/equipment
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
-Accept-Language: {{langEs}}
+Accept-Language: {{lang}}
 
 {
     "name": "Laptop Dell XPS",
@@ -139,28 +116,11 @@ Accept-Language: {{langEs}}
 
 ###
 
-### Crear equipo SIN imagen (EN)
-POST {{baseUrl}}/equipment
-Authorization: Bearer {{token}}
-Content-Type: application/json
-Accept: application/json
-Accept-Language: {{langEn}}
-
-{
-    "name": "MacBook Pro",
-    "type": "Laptop",
-    "description": "High performance laptop",
-    "stock": 3,
-    "status": "DISPONIBLE"
-}
-
-###
-
 ### Crear equipo CON imagen
 POST {{baseUrl}}/equipment
 Authorization: Bearer {{token}}
 Accept: application/json
-Accept-Language: {{langEs}}
+Accept-Language: {{lang}}
 Content-Type: multipart/form-data; boundary=boundary
 
 --boundary
@@ -193,11 +153,11 @@ Content-Type: image/jpeg
 ###
 
 ### Actualizar equipo
-PUT {{baseUrl}}/equipment/1
+PUT {{baseUrl}}/equipment/9
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
-Accept-Language: {{langEs}}
+Accept-Language: {{lang}}
 
 {
     "name": "Thinkpad T14",
@@ -209,36 +169,11 @@ Accept-Language: {{langEs}}
 
 ###
 
-### Actualizar equipo (EN)
-PUT {{baseUrl}}/equipment/1
-Authorization: Bearer {{token}}
-Content-Type: application/json
-Accept: application/json
-Accept-Language: {{langEn}}
-
-{
-    "name": "Thinkpad T14 Gen 5",
-    "type": "Laptop",
-    "description": "Updated version",
-    "stock": 8,
-    "status": "DISPONIBLE"
-}
-
-###
-
 ### Eliminar equipo
-DELETE {{baseUrl}}/equipment/1
+DELETE {{baseUrl}}/equipment/10
 Authorization: Bearer {{token}}
 Accept: application/json
-Accept-Language: {{langEs}}
-
-###
-
-### Eliminar equipo (EN)
-DELETE {{baseUrl}}/equipment/2
-Authorization: Bearer {{token}}
-Accept: application/json
-Accept-Language: {{langEn}}
+Accept-Language: {{lang}}
 
 
 ### ========================================
@@ -249,7 +184,7 @@ Accept-Language: {{langEn}}
 GET {{baseUrl}}/loans
 Authorization: Bearer {{token}}
 Accept: application/json
-Accept-Language: {{langEs}}
+Accept-Language: {{lang}}
 
 ###
 
@@ -257,15 +192,15 @@ Accept-Language: {{langEs}}
 GET {{baseUrl}}/loans/1
 Authorization: Bearer {{token}}
 Accept: application/json
-Accept-Language: {{langEs}}
+Accept-Language: {{lang}}
 
 ###
 
 ### Obtener mis préstamos
-GET {{baseUrl}}/my-loans
+GET {{baseUrl}}/loans/my
 Authorization: Bearer {{token}}
 Accept: application/json
-Accept-Language: {{langEs}}
+Accept-Language: {{lang}}
 
 ###
 
@@ -274,27 +209,12 @@ POST {{baseUrl}}/loans
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
-Accept-Language: {{langEs}}
+Accept-Language: {{lang}}
 
 {
     "estimated_end_date": "2026-05-30",
     "justification": "Necesario para trabajo remoto",
-    "equipment_id": 1
-}
-
-###
-
-### Crear préstamo (EN)
-POST {{baseUrl}}/loans
-Authorization: Bearer {{token}}
-Content-Type: application/json
-Accept: application/json
-Accept-Language: {{langEn}}
-
-{
-    "estimated_end_date": "2026-05-30",
-    "justification": "Needed for remote work",
-    "equipment_id": 1
+    "equipment_id": 7
 }
 
 ###
@@ -304,12 +224,12 @@ POST {{baseUrl}}/loans
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
-Accept-Language: {{langEn}}
+Accept-Language: {{lang}}
 
 {
     "estimated_end_date": "2020-01-01",
     "justification": "Testing invalid range",
-    "equipment_id": 1
+    "equipment_id": 6
 }
 
 ###
@@ -319,7 +239,7 @@ PUT {{baseUrl}}/loans/1
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
-Accept-Language: {{langEs}}
+Accept-Language: {{lang}}
 
 {
     "status": "APROBADO"
@@ -332,7 +252,7 @@ PUT {{baseUrl}}/loans/1
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
-Accept-Language: {{langEs}}
+Accept-Language: {{lang}}
 
 {
     "status": "PRESTADO"
@@ -341,11 +261,11 @@ Accept-Language: {{langEs}}
 ###
 
 ### Actualizar préstamo -> DEVUELTO
-PUT {{baseUrl}}/loans/1
+PUT {{baseUrl}}/loans/2
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
-Accept-Language: {{langEn}}
+Accept-Language: {{lang}}
 
 {
     "status": "DEVUELTO"
@@ -358,7 +278,7 @@ PUT {{baseUrl}}/loans/1
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
-Accept-Language: {{langEn}}
+Accept-Language: {{lang}}
 
 {
     "status": "PENDIENTE"
@@ -370,7 +290,7 @@ Accept-Language: {{langEn}}
 DELETE {{baseUrl}}/loans/1
 Authorization: Bearer {{token}}
 Accept: application/json
-Accept-Language: {{langEs}}
+Accept-Language: {{lang}}
 
 
 ### ========================================
@@ -381,7 +301,7 @@ Accept-Language: {{langEs}}
 GET {{baseUrl}}/users
 Authorization: Bearer {{token}}
 Accept: application/json
-Accept-Language: {{langEs}}
+Accept-Language: {{lang}}
 
 ###
 
@@ -389,7 +309,7 @@ Accept-Language: {{langEs}}
 GET {{baseUrl}}/users/3
 Authorization: Bearer {{token}}
 Accept: application/json
-Accept-Language: {{langEs}}
+Accept-Language: {{lang}}
 
 ###
 
@@ -398,7 +318,7 @@ POST {{baseUrl}}/users
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
-Accept-Language: {{langEs}}
+Accept-Language: {{lang}}
 
 {
     "username": "nuevo",
@@ -415,7 +335,7 @@ PUT {{baseUrl}}/users/5
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
-Accept-Language: {{langEs}}
+Accept-Language: {{lang}}
 
 {
     "full_name": "Usuario Actualizado"
@@ -427,4 +347,4 @@ Accept-Language: {{langEs}}
 DELETE {{baseUrl}}/users/3
 Authorization: Bearer {{token}}
 Accept: application/json
-Accept-Language: {{langEn}}
+Accept-Language: {{lang}}
