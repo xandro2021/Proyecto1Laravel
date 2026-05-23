@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\LoanStatus;
 use App\Models\Loan;
+use App\Models\Equipment;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
-use App\Models\Equipment;
 use Illuminate\Support\Facades\Auth;
 
 class LoanController extends Controller
@@ -41,7 +42,6 @@ class LoanController extends Controller
         $today = Carbon::today();
 
         if ($today->gt(Carbon::parse($validated['estimated_end_date']))) {
-
             return response()->json([
                 'message' => __('messages.invalid_date_range')
             ], 400);
@@ -50,13 +50,13 @@ class LoanController extends Controller
         $equipment = Equipment::findOrFail($validated['equipment_id']);
 
         if ($equipment->stock <= 0) {
-
             return response()->json([
                 'message' => __('messages.no_stock')
             ], 400);
         }
 
         $equipment->stock -= 1;
+        $equipment->applyBusinessRules();
         $equipment->save();
 
         $loan = Loan::create([
@@ -82,7 +82,6 @@ class LoanController extends Controller
             $loan->user_id !== Auth::id() &&
             auth()->user()->role !== 'ADMIN'
         ) {
-
             return response()->json([
                 'message' => __('messages.unauthorized')
             ], 403);
@@ -102,16 +101,21 @@ class LoanController extends Controller
             'status' => 'required|in:PENDIENTE,APROBADO,RECHAZADO,PRESTADO,DEVUELTO'
         ]);
 
-        $nuevo = $validated['status'];
-        $actual = $loan->status;
+        $actual = $loan->status instanceof \App\Enums\LoanStatus
+            ? $loan->status->value
+            : (string) $loan->status;
 
-        $error = $this->validarTransicion($actual, $nuevo);
+        $nuevo = $validated['status'] instanceof \App\Enums\LoanStatus
+            ? $validated['status']->value
+            : (string) $validated['status'];
 
-        if ($error) {
+        if ($actual === $nuevo) {
             return response()->json([
-                'message' => $error
-            ], 400);
+                'message' => __('messages.no_changes')
+            ]);
         }
+
+        $this->validarTransicion($actual, $nuevo);
 
         $equipment = $loan->equipment;
 
@@ -120,36 +124,36 @@ class LoanController extends Controller
             $nuevo === 'RECHAZADO'
         ) {
             $equipment->stock += 1;
-            $equipment->save();
-        }
-
-        if ($actual === 'APROBADO' && $nuevo === 'PRESTADO') {
-            $loan->start_date = Carbon::today();
         }
 
         if ($actual === 'PRESTADO' && $nuevo === 'DEVUELTO') {
-
             $equipment->stock += 1;
-            $equipment->save();
-
             $loan->actual_return_date = Carbon::today();
         }
 
         if ($actual === 'RECHAZADO' && $nuevo === 'PENDIENTE') {
-
             if ($equipment->stock <= 0) {
-
                 return response()->json([
                     'message' => __('messages.no_stock_re_evaluation')
                 ], 400);
             }
 
             $equipment->stock -= 1;
-            $equipment->save();
         }
+
+        if ($actual === 'APROBADO' && $nuevo === 'PRESTADO') {
+            $loan->start_date = Carbon::today();
+        }
+
+        $equipment->applyBusinessRules();
+        $equipment->save();
 
         $loan->status = $nuevo;
         $loan->save();
+        $loan->refresh();
+        $loan->status = $loan->status instanceof LoanStatus
+            ? $loan->status->value
+            : $loan->status;
 
         return response()->json([
             'message' => __('messages.loan_updated'),
@@ -159,7 +163,18 @@ class LoanController extends Controller
 
     public function destroy(string $id)
     {
-        Loan::destroy($id);
+        $loan = Loan::with('equipment')->findOrFail($id);
+
+        $equipment = $loan->equipment;
+
+        // 🔥 devolver stock si aplica
+        if (in_array($loan->status, ['PENDIENTE', 'APROBADO', 'PRESTADO'])) {
+            $equipment->stock += 1;
+            $equipment->applyBusinessRules();
+            $equipment->save();
+        }
+
+        $loan->delete();
 
         return response()->json([
             'message' => __('messages.loan_deleted')
@@ -168,40 +183,18 @@ class LoanController extends Controller
 
     private function validarTransicion($actual, $nuevo)
     {
-        if ($actual === $nuevo) {
-            return null;
+        if ($actual === $nuevo) return;
+
+        $map = [
+            'PENDIENTE' => ['APROBADO', 'RECHAZADO'],
+            'APROBADO'  => ['PRESTADO', 'RECHAZADO'],
+            'PRESTADO'  => ['DEVUELTO'],
+            'RECHAZADO' => ['PENDIENTE'],
+            'DEVUELTO'  => []
+        ];
+
+        if (!in_array($nuevo, $map[$actual])) {
+            throw new \Exception("Transición inválida: $actual → $nuevo");
         }
-
-        switch ($actual) {
-
-            case 'PENDIENTE':
-                if (!in_array($nuevo, ['APROBADO', 'RECHAZADO'])) {
-                    return __('messages.invalid_transition');
-                }
-                break;
-
-            case 'APROBADO':
-                if (!in_array($nuevo, ['PRESTADO', 'RECHAZADO'])) {
-                    return __('messages.invalid_transition');
-                }
-                break;
-
-            case 'PRESTADO':
-                if ($nuevo !== 'DEVUELTO') {
-                    return __('messages.invalid_transition');
-                }
-                break;
-
-            case 'RECHAZADO':
-                if ($nuevo !== 'PENDIENTE') {
-                    return __('messages.invalid_transition');
-                }
-                break;
-
-            case 'DEVUELTO':
-                return __('messages.returned_loan_locked');
-        }
-
-        return null;
     }
 }

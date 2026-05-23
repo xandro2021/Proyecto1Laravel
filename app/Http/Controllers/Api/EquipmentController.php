@@ -11,9 +11,8 @@ class EquipmentController extends Controller
 {
     private EquipmentImageService $imageService;
 
-    public function __construct(
-        EquipmentImageService $imageService
-    ) {
+    public function __construct(EquipmentImageService $imageService)
+    {
         $this->imageService = $imageService;
     }
 
@@ -22,6 +21,16 @@ class EquipmentController extends Controller
         return response()->json([
             'message' => __('messages.equipment_list'),
             'data' => Equipment::all()
+        ]);
+    }
+
+    public function show(string $id)
+    {
+        $equipment = Equipment::findOrFail($id);
+
+        return response()->json([
+            'message' => __('messages.equipment_found'),
+            'data' => $equipment
         ]);
     }
 
@@ -36,21 +45,18 @@ class EquipmentController extends Controller
             'image' => 'nullable|image|max:2048'
         ]);
 
-        $validated['status'] =
-            $this->applyBusinessRules(
-                $validated['stock'],
-                $validated['status']
-            );
+        $equipment = new Equipment();
+        $equipment->fill($validated);
 
         if ($request->hasFile('image')) {
-
-            $validated['image_filename'] =
-                $this->imageService->saveImage(
-                    $request->file('image')
-                );
+            $equipment->image_filename =
+                $this->imageService->saveImage($request->file('image'));
         }
 
-        $equipment = Equipment::create($validated);
+        // 🔥 regla centralizada en el modelo
+        $equipment->applyBusinessRules();
+
+        $equipment->save();
 
         return response()->json([
             'message' => __('messages.equipment_created'),
@@ -58,20 +64,8 @@ class EquipmentController extends Controller
         ], 201);
     }
 
-    public function show(string $id)
+    public function update(Request $request, string $id)
     {
-        $equipment = Equipment::findOrFail($id);
-
-        return response()->json([
-            'message' => __('messages.equipment_found'),
-            'data' => $equipment
-        ]);
-    }
-
-    public function update(
-        Request $request,
-        string $id
-    ) {
         $equipment = Equipment::findOrFail($id);
 
         $validated = $request->validate([
@@ -83,25 +77,22 @@ class EquipmentController extends Controller
             'image' => 'nullable|image|max:2048'
         ]);
 
-        $validated['status'] =
-            $this->applyBusinessRules(
-                $validated['stock'],
-                $validated['status']
-            );
+        $equipment->fill($validated);
 
         if ($request->hasFile('image')) {
 
-            $this->imageService->deleteImage(
-                $equipment->image_filename
-            );
+            if ($equipment->image_filename) {
+                $this->imageService->deleteImage($equipment->image_filename);
+            }
 
-            $validated['image_filename'] =
-                $this->imageService->saveImage(
-                    $request->file('image')
-                );
+            $equipment->image_filename =
+                $this->imageService->saveImage($request->file('image'));
         }
 
-        $equipment->update($validated);
+        // 🔥 regla de negocio SIEMPRE después de cambios
+        $equipment->applyBusinessRules();
+
+        $equipment->save();
 
         return response()->json([
             'message' => __('messages.equipment_updated'),
@@ -113,30 +104,14 @@ class EquipmentController extends Controller
     {
         $equipment = Equipment::findOrFail($id);
 
-        $this->imageService->deleteImage(
-            $equipment->image_filename
-        );
+        if ($equipment->image_filename) {
+            $this->imageService->deleteImage($equipment->image_filename);
+        }
 
         $equipment->delete();
 
         return response()->json([
             'message' => __('messages.equipment_deleted')
         ]);
-    }
-
-    private function applyBusinessRules(
-        int $stock,
-        string $status
-    ): string {
-
-        if ($stock <= 0) {
-            return 'OCUPADO';
-        }
-
-        if ($status !== 'MANTENIMIENTO') {
-            return 'DISPONIBLE';
-        }
-
-        return $status;
     }
 }

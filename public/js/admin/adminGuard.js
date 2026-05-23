@@ -1,5 +1,4 @@
 // adminGuard.js*
-(() => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
 
@@ -57,4 +56,3 @@
     // Inicializar protección
     // ─────────────────────────────────────────────
     validateAdminSession();
-})();

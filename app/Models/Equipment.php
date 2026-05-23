@@ -40,4 +40,13 @@ class Equipment extends Model
             ? asset('uploads/equipment/' . $this->image_filename)
             : asset('img/no-image.png');
     }
+
+    public function applyBusinessRules(): void
+    {
+        if ($this->stock <= 0) {
+            $this->status = 'OCUPADO';
+        } elseif ($this->status !== 'MANTENIMIENTO') {
+            $this->status = 'DISPONIBLE';
+        }
+    }
 }
