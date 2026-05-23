@@ -227,8 +227,7 @@ async function loadDashboardStats() {
 
         const response = await fetchApi('/dashboard/stats');
 
-
-        const data = response.data;
+        const data = response.data ?? response;
 
         document.getElementById("equiposDisponibles").innerText =
             data.equiposDisponibles;
@@ -283,7 +282,12 @@ async function loadTopEquipos() {
             await fetchApi('/dashboard/top-equipos');
 
         // ← IMPORTANTE
-        const data = response.data;
+        const data = response.data ?? response ?? [];
+
+        if (!Array.isArray(data)) {
+            console.error("top-equipos no es array:", data);
+            return;
+        }
 
         let html = "";
 
